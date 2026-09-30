@@ -3,7 +3,6 @@
    JOB & CLIENT MANAGEMENT PLATFORM
 ========================================================= */
 
-
 * {
     margin: 0;
     padding: 0;
@@ -50,9 +49,14 @@
 
 /* =========================================================
    DARK MODE
+   Works with both:
+   body.dark
+   [data-theme="dark"]
 ========================================================= */
 
-body.dark {
+body.dark,
+body[data-theme="dark"],
+html[data-theme="dark"] body {
     --bg: #0d1117;
     --surface: #151a21;
     --surface-2: #1b222b;
@@ -144,6 +148,10 @@ a {
 
     display: flex;
     flex-direction: column;
+
+    transition:
+        background var(--transition),
+        border-color var(--transition);
 }
 
 
@@ -643,11 +651,15 @@ a {
     color: var(--purple);
 }
 
-body.dark .stat-icon.blue {
+body.dark .stat-icon.blue,
+body[data-theme="dark"] .stat-icon.blue,
+html[data-theme="dark"] body .stat-icon.blue {
     background: #17263e;
 }
 
-body.dark .stat-icon.purple {
+body.dark .stat-icon.purple,
+body[data-theme="dark"] .stat-icon.purple,
+html[data-theme="dark"] body .stat-icon.purple {
     background: #251b3d;
 }
 
@@ -1108,7 +1120,9 @@ body.dark .stat-icon.purple {
     color: var(--danger);
 }
 
-body.dark .status-active {
+body.dark .status-active,
+body[data-theme="dark"] .status-active,
+html[data-theme="dark"] body .status-active {
     background: #17263e;
 }
 
@@ -2002,7 +2016,6 @@ body.dark .status-active {
 
 /* =========================================================
    TEAM MEMBERS
-   NEW FEATURE
 ========================================================= */
 
 .team-grid {
@@ -2280,7 +2293,6 @@ body.dark .status-active {
 
 /* =========================================================
    TASK MANAGEMENT
-   NEW FEATURE
 ========================================================= */
 
 .tasks-board {
@@ -3146,8 +3158,6 @@ input[type="range"] {
 
 @media (max-width: 800px) {
 
-    /* Hide hamburger */
-
     .mobile-menu-btn {
         display: none !important;
     }
@@ -3155,9 +3165,6 @@ input[type="range"] {
     .sidebar-overlay {
         display: none !important;
     }
-
-
-    /* Bottom navigation */
 
     .sidebar {
         position: fixed;
@@ -3190,16 +3197,10 @@ input[type="range"] {
             0 -6px 25px rgba(15, 23, 42, 0.08);
     }
 
-
-    /* Hide desktop logo and user */
-
     .sidebar-logo,
     .sidebar-footer {
         display: none;
     }
-
-
-    /* Bottom navigation container */
 
     .sidebar-nav {
         width: 100%;
@@ -3225,9 +3226,6 @@ input[type="range"] {
     .sidebar-nav::-webkit-scrollbar {
         display: none;
     }
-
-
-    /* Navigation links */
 
     .nav-link {
         flex:
@@ -3280,9 +3278,6 @@ input[type="range"] {
         display: none;
     }
 
-
-    /* Main content */
-
     .main-content {
         margin-left: 0;
 
@@ -3292,9 +3287,6 @@ input[type="range"] {
 
         padding-bottom: 76px;
     }
-
-
-    /* Topbar */
 
     .topbar {
         height: 74px;
@@ -3314,18 +3306,12 @@ input[type="range"] {
         font-size: 22px;
     }
 
-
-    /* Page */
-
     .page-content {
         padding:
             24px
             18px
             35px;
     }
-
-
-    /* Filters */
 
     .filter-bar {
         flex-wrap: wrap;
@@ -3339,15 +3325,9 @@ input[type="range"] {
         flex: 1;
     }
 
-
-    /* Team */
-
     .team-grid {
         grid-template-columns: 1fr;
     }
-
-
-    /* Tasks */
 
     .tasks-board {
         grid-template-columns: 1fr;
@@ -3376,9 +3356,6 @@ input[type="range"] {
     .section-heading p:not(.section-label) {
         font-size: 14px;
     }
-
-
-    /* Stats */
 
     .stats-grid {
         grid-template-columns:
@@ -3412,9 +3389,6 @@ input[type="range"] {
         font-size: 11px;
     }
 
-
-    /* Grids */
-
     .jobs-grid,
     .clients-grid,
     .wallet-grid,
@@ -3426,9 +3400,6 @@ input[type="range"] {
     .team-stats-grid {
         grid-template-columns: 1fr;
     }
-
-
-    /* Payments */
 
     .payment-item {
         grid-template-columns: 1fr;
@@ -3444,29 +3415,17 @@ input[type="range"] {
         text-align: left;
     }
 
-
-    /* Forms */
-
     .form-row {
         grid-template-columns: 1fr;
     }
-
-
-    /* Buttons */
 
     .section-heading > .primary-btn {
         width: 100%;
     }
 
-
-    /* Team cards */
-
     .team-card {
         padding: 17px;
     }
-
-
-    /* Task cards */
 
     .task-column {
         padding: 12px;
@@ -3489,9 +3448,6 @@ input[type="range"] {
 
         padding-bottom: 0;
     }
-
-
-    /* Bottom navigation */
 
     .sidebar {
         height: 72px;
@@ -3517,18 +3473,12 @@ input[type="range"] {
         padding-bottom: 72px;
     }
 
-
-    /* Page */
-
     .page-content {
         padding:
             20px
             13px
             30px;
     }
-
-
-    /* Topbar */
 
     .topbar {
         height: 70px;
@@ -3544,9 +3494,6 @@ input[type="range"] {
         font-size: 10px;
     }
 
-
-    /* Stats */
-
     .stats-grid {
         grid-template-columns: 1fr;
     }
@@ -3559,15 +3506,9 @@ input[type="range"] {
         font-size: 20px;
     }
 
-
-    /* Headings */
-
     .section-heading h2 {
         font-size: 23px;
     }
-
-
-    /* Job cards */
 
     .job-card {
         padding: 17px;
@@ -3577,9 +3518,6 @@ input[type="range"] {
         font-size: 15px;
     }
 
-
-    /* Team */
-
     .team-card-header {
         align-items: flex-start;
     }
@@ -3587,9 +3525,6 @@ input[type="range"] {
     .team-role {
         font-size: 10px;
     }
-
-
-    /* Tasks */
 
     .task-card h4 {
         font-size: 14px;
@@ -3607,9 +3542,6 @@ input[type="range"] {
         justify-content: flex-end;
     }
 
-
-    /* Modal */
-
     .modal-overlay {
         padding: 10px;
     }
@@ -3626,9 +3558,6 @@ input[type="range"] {
         font-size: 20px;
     }
 
-
-    /* Buttons */
-
     .modal-actions {
         flex-direction: column-reverse;
     }
@@ -3636,9 +3565,6 @@ input[type="range"] {
     .modal-actions button {
         width: 100%;
     }
-
-
-    /* Wallet */
 
     .wallet-card {
         padding: 16px;
