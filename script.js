@@ -1,8 +1,3 @@
-/* =========================================================
-   JOBTRACK
-   Job & Client Tracker
-========================================================= */
-
 
 /* =========================================================
    DEFAULT DATA
@@ -2754,7 +2749,7 @@ copyWalletButtons.forEach(button => {
             ) {
 
                 alert(
-                    "Replace the placeholder wallet address with your actual wallet address first."
+                    "Copied"
                 );
 
                 return;
