@@ -1,0 +1,1721 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="JobTrack - Manage your freelance jobs, clients and payments."
+    >
+
+    <title>JobTrack - Job & Client Tracker</title>
+
+    <!-- Bootstrap Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    >
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- =========================
+         SIDEBAR
+    ========================== -->
+
+    <aside class="sidebar" id="sidebar">
+
+        <div class="sidebar-logo">
+
+            <div class="logo-icon">
+                <i class="bi bi-kanban-fill"></i>
+            </div>
+
+            <div>
+                <h2>JobTrack</h2>
+                <span>Work smarter</span>
+            </div>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <p class="nav-title">MAIN</p>
+
+            <a
+                href="#dashboard"
+                class="nav-link active"
+                data-section="dashboard"
+            >
+                <i class="bi bi-grid-1x2-fill"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a
+                href="#projects"
+                class="nav-link"
+                data-section="projects"
+            >
+                <i class="bi bi-kanban"></i>
+                <span>Projects</span>
+            </a>
+
+            <a
+                href="#clients"
+                class="nav-link"
+                data-section="clients"
+            >
+                <i class="bi bi-people"></i>
+                <span>Clients</span>
+            </a>
+
+            <a
+                href="#payments"
+                class="nav-link"
+                data-section="payments"
+            >
+                <i class="bi bi-wallet2"></i>
+                <span>Payments</span>
+            </a>
+
+            <a
+                href="#calendar"
+                class="nav-link"
+                data-section="calendar"
+            >
+                <i class="bi bi-calendar3"></i>
+                <span>Calendar</span>
+            </a>
+
+
+            <p class="nav-title nav-title-bottom">
+                SYSTEM
+            </p>
+
+            <a
+                href="#settings"
+                class="nav-link"
+                data-section="settings"
+            >
+                <i class="bi bi-gear"></i>
+                <span>Settings</span>
+            </a>
+
+            <button
+                type="button"
+                class="nav-link theme-toggle"
+                id="themeToggle"
+            >
+                <i class="bi bi-moon-stars"></i>
+                <span>Dark Mode</span>
+            </button>
+
+        </nav>
+
+
+        <div class="sidebar-footer">
+
+            <div class="sidebar-user">
+
+                <div class="user-avatar">
+                    M
+                </div>
+
+                <div class="user-info">
+                    <strong>Mubeeey</strong>
+                    <span>Freelancer</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- Mobile overlay -->
+
+    <div
+        class="sidebar-overlay"
+        id="sidebarOverlay"
+    ></div>
+
+
+    <!-- =========================
+         MAIN
+    ========================== -->
+
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <button
+                    type="button"
+                    class="mobile-menu-btn"
+                    id="mobileMenuBtn"
+                >
+                    <i class="bi bi-list"></i>
+                </button>
+
+                <div>
+
+                    <p class="topbar-label">
+                        WORKSPACE
+                    </p>
+
+                    <h1 id="pageTitle">
+                        Dashboard
+                    </h1>
+
+                </div>
+
+            </div>
+
+
+            <div class="topbar-right">
+
+                <button
+                    type="button"
+                    class="icon-btn"
+                    id="topThemeToggle"
+                    title="Toggle theme"
+                >
+                    <i class="bi bi-moon-stars"></i>
+                </button>
+
+                <div class="topbar-date">
+                    <i class="bi bi-calendar3"></i>
+                    <span id="currentDate"></span>
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =========================
+             PAGE CONTENT
+        ========================== -->
+
+        <div class="page-content">
+
+
+            <!-- =========================
+                 DASHBOARD
+            ========================== -->
+
+            <section
+                id="dashboard"
+                class="page-section active"
+            >
+
+                <div class="section-heading">
+
+                    <div>
+                        <p class="section-label">
+                            OVERVIEW
+                        </p>
+
+                        <h2>
+                            Welcome back
+                        </h2>
+
+                        <p>
+                            Here's what's happening with your work.
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="primary-btn"
+                        id="dashboardAddJobBtn"
+                    >
+                        <i class="bi bi-plus-lg"></i>
+                        Add Job
+                    </button>
+
+                </div>
+
+
+                <!-- Dashboard stats -->
+
+                <div class="stats-grid">
+
+                    <div class="stat-card">
+
+                        <div class="stat-icon blue">
+                            <i class="bi bi-briefcase-fill"></i>
+                        </div>
+
+                        <div class="stat-content">
+
+                            <span>Total Jobs</span>
+
+                            <strong id="totalJobs">
+                                0
+                            </strong>
+
+                            <small>
+                                All projects
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat-card">
+
+                        <div class="stat-icon green">
+                            <i class="bi bi-check-circle-fill"></i>
+                        </div>
+
+                        <div class="stat-content">
+
+                            <span>Completed</span>
+
+                            <strong id="completedJobs">
+                                0
+                            </strong>
+
+                            <small>
+                                Finished projects
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat-card">
+
+                        <div class="stat-icon orange">
+                            <i class="bi bi-hourglass-split"></i>
+                        </div>
+
+                        <div class="stat-content">
+
+                            <span>Outstanding</span>
+
+                            <strong id="outstandingAmount">
+                                $0.00
+                            </strong>
+
+                            <small>
+                                Pending payments
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat-card">
+
+                        <div class="stat-icon purple">
+                            <i class="bi bi-cash-stack"></i>
+                        </div>
+
+                        <div class="stat-content">
+
+                            <span>Total Paid</span>
+
+                            <strong id="totalPaid">
+                                $0.00
+                            </strong>
+
+                            <small>
+                                Money received
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Dashboard columns -->
+
+                <div class="dashboard-grid">
+
+                    <!-- Recent projects -->
+
+                    <div class="dashboard-card">
+
+                        <div class="card-header">
+
+                            <div>
+                                <h3>
+                                    Recent Projects
+                                </h3>
+
+                                <p>
+                                    Your latest jobs
+                                </p>
+                            </div>
+
+                            <button
+                                type="button"
+                                class="text-btn"
+                                data-section-link="projects"
+                            >
+                                View All
+                                <i class="bi bi-arrow-right"></i>
+                            </button>
+
+                        </div>
+
+                        <div
+                            id="recentProjects"
+                            class="recent-projects"
+                        ></div>
+
+                    </div>
+
+
+                    <!-- Clients -->
+
+                    <div class="dashboard-card">
+
+                        <div class="card-header">
+
+                            <div>
+                                <h3>
+                                    Clients
+                                </h3>
+
+                                <p>
+                                    Your latest clients
+                                </p>
+                            </div>
+
+                            <button
+                                type="button"
+                                class="text-btn"
+                                data-section-link="clients"
+                            >
+                                View All
+                                <i class="bi bi-arrow-right"></i>
+                            </button>
+
+                        </div>
+
+                        <div
+                            id="dashboardClients"
+                            class="dashboard-client-list"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =========================
+                 PROJECTS
+            ========================== -->
+
+            <section
+                id="projects"
+                class="page-section"
+            >
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <p class="section-label">
+                            WORK
+                        </p>
+
+                        <h2>
+                            Projects
+                        </h2>
+
+                        <p>
+                            Manage your jobs and track their progress.
+                        </p>
+
+                    </div>
+
+                    <button
+                        type="button"
+                        class="primary-btn"
+                        id="addJobBtn"
+                    >
+                        <i class="bi bi-plus-lg"></i>
+                        Add Job
+                    </button>
+
+                </div>
+
+
+                <!-- Filters -->
+
+                <div class="filter-bar">
+
+                    <div class="search-box">
+
+                        <i class="bi bi-search"></i>
+
+                        <input
+                            type="search"
+                            id="jobSearch"
+                            placeholder="Search projects..."
+                        >
+
+                    </div>
+
+
+                    <div class="filter-select">
+
+                        <i class="bi bi-funnel"></i>
+
+                        <select id="statusFilter">
+
+                            <option value="all">
+                                All Status
+                            </option>
+
+                            <option value="active">
+                                Active
+                            </option>
+
+                            <option value="pending">
+                                Pending
+                            </option>
+
+                            <option value="completed">
+                                Completed
+                            </option>
+
+                            <option value="cancelled">
+                                Cancelled
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="filter-select">
+
+                        <i class="bi bi-wallet2"></i>
+
+                        <select id="paymentFilter">
+
+                            <option value="all">
+                                All Payments
+                            </option>
+
+                            <option value="paid">
+                                Fully Paid
+                            </option>
+
+                            <option value="partial">
+                                Partially Paid
+                            </option>
+
+                            <option value="pending">
+                                Payment Pending
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Jobs -->
+
+                <div
+                    id="jobsGrid"
+                    class="jobs-grid"
+                ></div>
+
+
+                <div
+                    id="emptyJobs"
+                    class="empty-state hidden"
+                >
+
+                    <div class="empty-icon">
+                        <i class="bi bi-kanban"></i>
+                    </div>
+
+                    <h3>
+                        No projects found
+                    </h3>
+
+                    <p>
+                        Add a project to start tracking your work.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="primary-btn"
+                        id="emptyAddJobBtn"
+                    >
+                        <i class="bi bi-plus-lg"></i>
+                        Add Job
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <!-- =========================
+                 CLIENTS
+            ========================== -->
+
+            <section
+                id="clients"
+                class="page-section"
+            >
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <p class="section-label">
+                            CRM
+                        </p>
+
+                        <h2>
+                            Clients
+                        </h2>
+
+                        <p>
+                            Keep your client information organized.
+                        </p>
+
+                    </div>
+
+                    <button
+                        type="button"
+                        class="primary-btn"
+                        id="addClientBtn"
+                    >
+                        <i class="bi bi-person-plus"></i>
+                        Add Client
+                    </button>
+
+                </div>
+
+
+                <!-- Client stats -->
+
+                <div class="mini-stats-grid">
+
+                    <div class="mini-stat-card">
+
+                        <i class="bi bi-people-fill"></i>
+
+                        <div>
+                            <span>Total Clients</span>
+
+                            <strong id="totalClients">
+                                0
+                            </strong>
+                        </div>
+
+                    </div>
+
+
+                    <div class="mini-stat-card">
+
+                        <i class="bi bi-person-check-fill"></i>
+
+                        <div>
+                            <span>Active Clients</span>
+
+                            <strong id="activeClients">
+                                0
+                            </strong>
+                        </div>
+
+                    </div>
+
+
+                    <div class="mini-stat-card">
+
+                        <i class="bi bi-check-circle"></i>
+
+                        <div>
+                            <span>Completed</span>
+
+                            <strong id="completedClients">
+                                0
+                            </strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Search -->
+
+                <div class="filter-bar single-filter">
+
+                    <div class="search-box">
+
+                        <i class="bi bi-search"></i>
+
+                        <input
+                            type="search"
+                            id="clientSearch"
+                            placeholder="Search clients..."
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Clients -->
+
+                <div
+                    id="clientsGrid"
+                    class="clients-grid"
+                ></div>
+
+
+                <div
+                    id="emptyClients"
+                    class="empty-state hidden"
+                >
+
+                    <div class="empty-icon">
+                        <i class="bi bi-people"></i>
+                    </div>
+
+                    <h3>
+                        No clients found
+                    </h3>
+
+                    <p>
+                        Add a client to start building your CRM.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="primary-btn"
+                        id="emptyAddClientBtn"
+                    >
+                        <i class="bi bi-person-plus"></i>
+                        Add Client
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <!-- =========================
+                 PAYMENTS
+            ========================== -->
+
+            <section
+                id="payments"
+                class="page-section"
+            >
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <p class="section-label">
+                            FINANCE
+                        </p>
+
+                        <h2>
+                            Payments
+                        </h2>
+
+                        <p>
+                            Track your project payments.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Payment stats -->
+
+                <div class="stats-grid">
+
+                    <div class="stat-card">
+
+                        <div class="stat-icon blue">
+                            <i class="bi bi-receipt"></i>
+                        </div>
+
+                        <div class="stat-content">
+
+                            <span>
+                                Total Project Value
+                            </span>
+
+                            <strong id="totalProjectValue">
+                                $0.00
+                            </strong>
+
+                            <small>
+                                All projects
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat-card">
+
+                        <div class="stat-icon green">
+                            <i class="bi bi-cash-coin"></i>
+                        </div>
+
+                        <div class="stat-content">
+
+                            <span>
+                                Total Paid
+                            </span>
+
+                            <strong id="paymentTotalPaid">
+                                $0.00
+                            </strong>
+
+                            <small>
+                                Received
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat-card">
+
+                        <div class="stat-icon orange">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+
+                        <div class="stat-content">
+
+                            <span>
+                                Outstanding
+                            </span>
+
+                            <strong id="paymentOutstanding">
+                                $0.00
+                            </strong>
+
+                            <small>
+                                Still to collect
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Crypto wallets -->
+
+                <div class="dashboard-card wallet-payment-card">
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <h3>
+                                Crypto Payment Wallets
+                            </h3>
+
+                            <p>
+                                Clients can copy a wallet address
+                                for payment.
+                            </p>
+
+                        </div>
+
+                        <div class="wallet-header-icon">
+                            <i class="bi bi-wallet2"></i>
+                        </div>
+
+                    </div>
+
+
+                    <div class="wallet-grid">
+
+
+                        <!-- USDT -->
+
+                        <div class="wallet-card">
+
+                            <div class="wallet-card-header">
+
+                                <div class="wallet-icon">
+                                    <i class="bi bi-currency-dollar"></i>
+                                </div>
+
+                                <div>
+
+                                    <h4>
+                                        USDT
+                                    </h4>
+
+                                    <span>
+                                        Solana Network
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <span class="wallet-label">
+                                Wallet Address
+                            </span>
+
+
+                            <div class="wallet-address">
+                                <span>
+                                    YOUR_USDT_SOL_WALLET
+                                </span>
+                            </div>
+
+
+                            <button
+                                type="button"
+                                class="copy-wallet-btn"
+                                data-wallet="YOUR_USDT_SOL_WALLET"
+                            >
+                                <i class="bi bi-copy"></i>
+                                <span>
+                                    Copy Address
+                                </span>
+                            </button>
+
+                        </div>
+
+
+                        <!-- SOL -->
+
+                        <div class="wallet-card">
+
+                            <div class="wallet-card-header">
+
+                                <div class="wallet-icon">
+                                    <i class="bi bi-currency-dollar"></i>
+                                </div>
+
+                                <div>
+
+                                    <h4>
+                                        SOL
+                                    </h4>
+
+                                    <span>
+                                        Solana Network
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <span class="wallet-label">
+                                Wallet Address
+                            </span>
+
+
+                            <div class="wallet-address">
+                                <span>
+                                    YOUR_SOL_WALLET
+                                </span>
+                            </div>
+
+
+                            <button
+                                type="button"
+                                class="copy-wallet-btn"
+                                data-wallet="YOUR_SOL_WALLET"
+                            >
+                                <i class="bi bi-copy"></i>
+                                <span>
+                                    Copy Address
+                                </span>
+                            </button>
+
+                        </div>
+
+
+                        <!-- USDC -->
+
+                        <div class="wallet-card">
+
+                            <div class="wallet-card-header">
+
+                                <div class="wallet-icon">
+                                    <i class="bi bi-currency-dollar"></i>
+                                </div>
+
+                                <div>
+
+                                    <h4>
+                                        USDC
+                                    </h4>
+
+                                    <span>
+                                        Solana Network
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <span class="wallet-label">
+                                Wallet Address
+                            </span>
+
+
+                            <div class="wallet-address">
+                                <span>
+                                    YOUR_USDC_SOL_WALLET
+                                </span>
+                            </div>
+
+
+                            <button
+                                type="button"
+                                class="copy-wallet-btn"
+                                data-wallet="YOUR_USDC_SOL_WALLET"
+                            >
+                                <i class="bi bi-copy"></i>
+                                <span>
+                                    Copy Address
+                                </span>
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="wallet-note">
+
+                        <i class="bi bi-info-circle"></i>
+
+                        <span>
+                           Always verify the wallet address and make sure you are sending on the Solana blockchain. A mistake may result in permanent loss of funds.
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Payment overview -->
+
+                <div class="dashboard-card">
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <h3>
+                                Payment Overview
+                            </h3>
+
+                            <p>
+                                Payment status for each project.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="paymentList"
+                        class="payment-list"
+                    ></div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =========================
+                 CALENDAR
+            ========================== -->
+
+            <section
+                id="calendar"
+                class="page-section"
+            >
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <p class="section-label">
+                            SCHEDULE
+                        </p>
+
+                        <h2>
+                            Calendar
+                        </h2>
+
+                        <p>
+                            Keep an eye on your upcoming deadlines.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="dashboard-card">
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <h3>
+                                Upcoming Deadlines
+                            </h3>
+
+                            <p>
+                                Projects that need your attention.
+                            </p>
+
+                        </div>
+
+                        <i class="bi bi-calendar-event calendar-header-icon"></i>
+
+                    </div>
+
+
+                    <div
+                        id="deadlineList"
+                        class="deadline-list"
+                    ></div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =========================
+                 SETTINGS
+            ========================== -->
+
+            <section
+                id="settings"
+                class="page-section"
+            >
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <p class="section-label">
+                            PREFERENCES
+                        </p>
+
+                        <h2>
+                            Settings
+                        </h2>
+
+                        <p>
+                            Customize your JobTrack workspace.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="settings-grid">
+
+                    <div class="settings-card">
+
+                        <div class="settings-card-icon">
+                            <i class="bi bi-palette"></i>
+                        </div>
+
+                        <div class="settings-card-content">
+
+                            <h3>
+                                Appearance
+                            </h3>
+
+                            <p>
+                                Change the appearance of JobTrack.
+                            </p>
+
+                            <button
+                                type="button"
+                                class="secondary-btn"
+                                id="settingsThemeToggle"
+                            >
+                                <i class="bi bi-moon-stars"></i>
+                                Toggle Dark Mode
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="settings-card">
+
+                        <div class="settings-card-icon">
+                            <i class="bi bi-database"></i>
+                        </div>
+
+                        <div class="settings-card-content">
+
+                            <h3>
+                                Local Storage
+                            </h3>
+
+                            <p>
+                                Your projects and clients are saved
+                                in your browser.
+                            </p>
+
+                            <span class="storage-status">
+                                <i class="bi bi-check-circle-fill"></i>
+                                Local storage active
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="settings-card">
+
+                        <div class="settings-card-icon">
+                            <i class="bi bi-info-circle"></i>
+                        </div>
+
+                        <div class="settings-card-content">
+
+                            <h3>
+                                About JobTrack
+                            </h3>
+
+                            <p>
+                                A freelance job and client tracker
+                                built with HTML, CSS and JavaScript.
+                            </p>
+
+                            <span class="app-version">
+                                Version 1.0.0
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+
+    <!-- =========================
+         JOB MODAL
+    ========================== -->
+
+    <div
+        class="modal-overlay"
+        id="jobModal"
+    >
+
+        <div class="modal">
+
+            <div class="modal-header">
+
+                <div>
+
+                    <p class="modal-label">
+                        PROJECT
+                    </p>
+
+                    <h3 id="jobModalTitle">
+                        Add New Job
+                    </h3>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="modal-close"
+                    id="closeJobModal"
+                >
+                    <i class="bi bi-x-lg"></i>
+                </button>
+
+            </div>
+
+
+            <form id="jobForm">
+
+                <input
+                    type="hidden"
+                    id="jobId"
+                >
+
+
+                <div class="form-group">
+
+                    <label for="jobName">
+                        Project Name
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i class="bi bi-folder2-open"></i>
+
+                        <input
+                            type="text"
+                            id="jobName"
+                            placeholder="e.g. Web3 Landing Page"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="jobClient">
+                        Client
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i class="bi bi-person"></i>
+
+                        <input
+                            type="text"
+                            id="jobClient"
+                            placeholder="e.g. VampCatCoin"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label for="jobBudget">
+                            Total Budget
+                        </label>
+
+                        <div class="input-wrapper">
+
+                            <span class="input-prefix">
+                                $
+                            </span>
+
+                            <input
+                                type="number"
+                                id="jobBudget"
+                                min="0"
+                                step="0.01"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="jobPaid">
+                            Amount Paid
+                        </label>
+
+                        <div class="input-wrapper">
+
+                            <span class="input-prefix">
+                                $
+                            </span>
+
+                            <input
+                                type="number"
+                                id="jobPaid"
+                                min="0"
+                                step="0.01"
+                                value="0"
+                            >
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label for="jobDeadline">
+                            Deadline
+                        </label>
+
+                        <div class="input-wrapper">
+
+                            <i class="bi bi-calendar3"></i>
+
+                            <input
+                                type="date"
+                                id="jobDeadline"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="jobStatus">
+                            Status
+                        </label>
+
+                        <div class="input-wrapper">
+
+                            <i class="bi bi-circle-half"></i>
+
+                            <select id="jobStatus">
+
+                                <option value="active">
+                                    Active
+                                </option>
+
+                                <option value="pending">
+                                    Pending
+                                </option>
+
+                                <option value="completed">
+                                    Completed
+                                </option>
+
+                                <option value="cancelled">
+                                    Cancelled
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <div class="label-row">
+
+                        <label for="jobProgress">
+                            Progress
+                        </label>
+
+                        <span id="progressValue">
+                            0%
+                        </span>
+
+                    </div>
+
+                    <input
+                        type="range"
+                        id="jobProgress"
+                        min="0"
+                        max="100"
+                        value="0"
+                    >
+
+                </div>
+
+
+                <div class="payment-preview">
+
+                    <div>
+
+                        <span>
+                            Payment Status
+                        </span>
+
+                        <strong id="previewPaymentStatus">
+                            Payment Pending
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            Remaining
+                        </span>
+
+                        <strong id="previewRemaining">
+                            $0.00
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="modal-actions">
+
+                    <button
+                        type="button"
+                        class="secondary-btn"
+                        id="cancelJobBtn"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="primary-btn"
+                    >
+                        <i class="bi bi-check-lg"></i>
+                        Save Job
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         CLIENT MODAL
+    ========================== -->
+
+    <div
+        class="modal-overlay"
+        id="clientModal"
+    >
+
+        <div class="modal">
+
+            <div class="modal-header">
+
+                <div>
+
+                    <p class="modal-label">
+                        CLIENT
+                    </p>
+
+                    <h3 id="clientModalTitle">
+                        Add New Client
+                    </h3>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="modal-close"
+                    id="closeClientModal"
+                >
+                    <i class="bi bi-x-lg"></i>
+                </button>
+
+            </div>
+
+
+            <form id="clientForm">
+
+                <input
+                    type="hidden"
+                    id="clientId"
+                >
+
+
+                <div class="form-group">
+
+                    <label for="clientName">
+                        Client Name
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i class="bi bi-person"></i>
+
+                        <input
+                            type="text"
+                            id="clientName"
+                            placeholder="e.g. Ahmed Designs"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label for="clientEmail">
+                            Email
+                        </label>
+
+                        <div class="input-wrapper">
+
+                            <i class="bi bi-envelope"></i>
+
+                            <input
+                                type="email"
+                                id="clientEmail"
+                                placeholder="client@example.com"
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="clientPhone">
+                            Phone
+                        </label>
+
+                        <div class="input-wrapper">
+
+                            <i class="bi bi-telephone"></i>
+
+                            <input
+                                type="tel"
+                                id="clientPhone"
+                                placeholder="+234..."
+                            >
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="clientCompany">
+                        Company
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i class="bi bi-building"></i>
+
+                        <input
+                            type="text"
+                            id="clientCompany"
+                            placeholder="Company name"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="clientNotes">
+                        Notes
+                    </label>
+
+                    <textarea
+                        id="clientNotes"
+                        rows="4"
+                        placeholder="Add notes about this client..."
+                    ></textarea>
+
+                </div>
+
+
+                <div class="modal-actions">
+
+                    <button
+                        type="button"
+                        class="secondary-btn"
+                        id="cancelClientBtn"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="primary-btn"
+                    >
+                        <i class="bi bi-check-lg"></i>
+                        Save Client
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- JAVASCRIPT -->
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
