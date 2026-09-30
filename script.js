@@ -5244,3 +5244,375 @@ displayTasks();
 updateTeamStats();
 
 updateTaskStats();
+
+
+/* =========================================================
+   SETTINGS + DARK MODE
+========================================================= */
+
+const themeToggle = document.getElementById("themeToggle");
+const topThemeToggle = document.getElementById("topThemeToggle");
+const settingsThemeToggle = document.getElementById("settingsThemeToggle");
+
+const THEME_KEY = "jobTrackTheme";
+
+
+function setTheme(theme) {
+
+    const finalTheme =
+        theme === "dark"
+            ? "dark"
+            : "light";
+
+    const isDark = finalTheme === "dark";
+
+
+    /* Body class - required by CSS */
+
+    document.body.classList.toggle(
+        "dark",
+        isDark
+    );
+
+
+    /* Keep data attributes synchronized */
+
+    document.body.dataset.theme =
+        finalTheme;
+
+    document.documentElement.dataset.theme =
+        finalTheme;
+
+
+    /* Save preference */
+
+    localStorage.setItem(
+        THEME_KEY,
+        finalTheme
+    );
+
+
+    updateThemeButtons(isDark);
+
+}
+
+
+function getCurrentTheme() {
+
+    if (
+        document.body.classList.contains("dark") ||
+        document.body.dataset.theme === "dark" ||
+        document.documentElement.dataset.theme === "dark"
+    ) {
+
+        return "dark";
+
+    }
+
+
+    return "light";
+
+}
+
+
+function updateThemeButtons(isDark) {
+
+    const icon =
+        isDark
+            ? "bi-sun"
+            : "bi-moon-stars";
+
+    const label =
+        isDark
+            ? "Light Mode"
+            : "Dark Mode";
+
+
+    /* Sidebar button */
+
+    if (themeToggle) {
+
+        themeToggle.innerHTML = `
+            <i class="bi ${icon}"></i>
+            <span>${label}</span>
+        `;
+
+        themeToggle.title =
+            label;
+
+        themeToggle.setAttribute(
+            "aria-label",
+            label
+        );
+
+    }
+
+
+    /* Topbar button */
+
+    if (topThemeToggle) {
+
+        topThemeToggle.innerHTML = `
+            <i class="bi ${icon}"></i>
+        `;
+
+        topThemeToggle.title =
+            label;
+
+        topThemeToggle.setAttribute(
+            "aria-label",
+            label
+        );
+
+    }
+
+
+    /* Settings button */
+
+    if (settingsThemeToggle) {
+
+        settingsThemeToggle.innerHTML = `
+            <i class="bi ${icon}"></i>
+            ${label}
+        `;
+
+        settingsThemeToggle.title =
+            label;
+
+        settingsThemeToggle.setAttribute(
+            "aria-label",
+            label
+        );
+
+    }
+
+}
+
+
+function toggleTheme() {
+
+    const currentTheme =
+        getCurrentTheme();
+
+    const newTheme =
+        currentTheme === "dark"
+            ? "light"
+            : "dark";
+
+
+    setTheme(newTheme);
+
+}
+
+
+/* Theme buttons */
+
+if (themeToggle) {
+
+    themeToggle.addEventListener(
+        "click",
+        toggleTheme
+    );
+
+}
+
+
+if (topThemeToggle) {
+
+    topThemeToggle.addEventListener(
+        "click",
+        toggleTheme
+    );
+
+}
+
+
+if (settingsThemeToggle) {
+
+    settingsThemeToggle.addEventListener(
+        "click",
+        toggleTheme
+    );
+
+}
+
+
+/* =========================================================
+   MOBILE SIDEBAR
+========================================================= */
+
+const mobileMenuBtn =
+    document.getElementById(
+        "mobileMenuBtn"
+    );
+
+const sidebar =
+    document.getElementById(
+        "sidebar"
+    );
+
+const sidebarOverlay =
+    document.getElementById(
+        "sidebarOverlay"
+    );
+
+
+function openMobileSidebar() {
+
+    if (!sidebar) {
+        return;
+    }
+
+
+    sidebar.classList.add(
+        "mobile-open"
+    );
+
+
+    if (sidebarOverlay) {
+
+        sidebarOverlay.classList.add(
+            "active"
+        );
+
+    }
+
+}
+
+
+function closeMobileSidebar() {
+
+    if (!sidebar) {
+        return;
+    }
+
+
+    sidebar.classList.remove(
+        "mobile-open"
+    );
+
+
+    if (sidebarOverlay) {
+
+        sidebarOverlay.classList.remove(
+            "active"
+        );
+
+    }
+
+}
+
+
+if (mobileMenuBtn) {
+
+    mobileMenuBtn.addEventListener(
+        "click",
+        openMobileSidebar
+    );
+
+}
+
+
+if (sidebarOverlay) {
+
+    sidebarOverlay.addEventListener(
+        "click",
+        closeMobileSidebar
+    );
+
+}
+
+
+/* Close mobile sidebar when a navigation
+   link is selected */
+
+document
+    .querySelectorAll(".nav-link[data-section]")
+    .forEach(link => {
+
+        link.addEventListener(
+            "click",
+            closeMobileSidebar
+        );
+
+    });
+
+
+/* =========================================================
+   CURRENT DATE
+========================================================= */
+
+const currentDate =
+    document.getElementById(
+        "currentDate"
+    );
+
+
+function updateCurrentDate() {
+
+    if (!currentDate) {
+        return;
+    }
+
+
+    const now =
+        new Date();
+
+
+    currentDate.textContent =
+        now.toLocaleDateString(
+            "en-NG",
+            {
+                weekday: "short",
+                day: "numeric",
+                month: "short",
+                year: "numeric"
+            }
+        );
+
+}
+
+
+/* =========================================================
+   SETTINGS INITIALIZATION
+========================================================= */
+
+function initializeTheme() {
+
+    const savedTheme =
+        localStorage.getItem(
+            THEME_KEY
+        );
+
+
+    if (savedTheme === "dark") {
+
+        setTheme("dark");
+
+    } else {
+
+        setTheme("light");
+
+    }
+
+}
+
+
+/* =========================================================
+   INITIAL DATE
+========================================================= */
+
+updateCurrentDate();
+
+
+setInterval(
+    updateCurrentDate,
+    60000
+);
+
+
+/* =========================================================
+   INITIAL THEME
+========================================================= */
+
+initializeTheme();
