@@ -4723,16 +4723,52 @@ initialize();
    COPY WALLET ADDRESS
 ========================================================= */
 
-function copyWalletAddress(button) {
+document.addEventListener("click", async function (event) {
+    const button = event.target.closest(".copy-address");
+
+    if (!button) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
     const address = button.dataset.address;
 
     if (!address) {
-        console.error("Wallet address not found.");
+        console.error("No wallet address found.");
         return;
     }
 
-    navigator.clipboard.writeText(address)
-        .then(() => {
+    try {
+        await navigator.clipboard.writeText(address);
+
+        const originalHTML = button.innerHTML;
+
+        button.innerHTML = `
+            <i class="bi bi-check2"></i>
+            Copied
+        `;
+
+        setTimeout(() => {
+            button.innerHTML = originalHTML;
+        }, 1500);
+
+    } catch (error) {
+        console.error("Clipboard error:", error);
+
+        // Fallback
+        const textarea = document.createElement("textarea");
+
+        textarea.value = address;
+        textarea.style.position = "fixed";
+        textarea.style.left = "-9999px";
+
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+
+        try {
+            document.execCommand("copy");
+
             const originalHTML = button.innerHTML;
 
             button.innerHTML = `
@@ -4740,55 +4776,14 @@ function copyWalletAddress(button) {
                 Copied
             `;
 
-            button.classList.add("copied");
-
             setTimeout(() => {
                 button.innerHTML = originalHTML;
-                button.classList.remove("copied");
             }, 1500);
-        })
-        .catch(error => {
-            console.error("Failed to copy address:", error);
 
-            // Fallback for browsers where Clipboard API is unavailable
-            const textarea = document.createElement("textarea");
+        } catch (fallbackError) {
+            alert("Could not copy the address.");
+        }
 
-            textarea.value = address;
-            textarea.style.position = "fixed";
-            textarea.style.opacity = "0";
-
-            document.body.appendChild(textarea);
-            textarea.select();
-
-            try {
-                document.execCommand("copy");
-
-                const originalHTML = button.innerHTML;
-
-                button.innerHTML = `
-                    <i class="bi bi-check2"></i>
-                    Copied
-                `;
-
-                setTimeout(() => {
-                    button.innerHTML = originalHTML;
-                }, 1500);
-            } catch (err) {
-                alert("Unable to copy the address.");
-            }
-
-            textarea.remove();
-        });
-}
-
-
-/* Attach copy buttons */
-
-document.querySelectorAll(".copy-address").forEach(button => {
-    button.addEventListener("click", function (event) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        copyWalletAddress(this);
-    });
+        textarea.remove();
+    }
 });
