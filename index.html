@@ -11,7 +11,7 @@
 
     <meta
         name="description"
-        content="JobTrack - Manage your freelance jobs, clients and payments."
+        content="JobTrack - Manage your freelance jobs, clients, team, tasks and payments."
     >
 
     <title>JobTrack - Job & Client Tracker</title>
@@ -71,11 +71,29 @@
             </a>
 
             <a
+                href="#tasks"
+                class="nav-link"
+                data-section="tasks"
+            >
+                <i class="bi bi-check2-square"></i>
+                <span>Tasks</span>
+            </a>
+
+            <a
+                href="#team"
+                class="nav-link"
+                data-section="team"
+            >
+                <i class="bi bi-people"></i>
+                <span>Team</span>
+            </a>
+
+            <a
                 href="#clients"
                 class="nav-link"
                 data-section="clients"
             >
-                <i class="bi bi-people"></i>
+                <i class="bi bi-person-vcard"></i>
                 <span>Clients</span>
             </a>
 
@@ -349,6 +367,72 @@
                 </div>
 
 
+                <!-- Team / Task stats -->
+
+                <div class="mini-stats-grid dashboard-work-stats">
+
+                    <div class="mini-stat-card">
+
+                        <i class="bi bi-people-fill"></i>
+
+                        <div>
+                            <span>Team Members</span>
+
+                            <strong id="dashboardTeamCount">
+                                0
+                            </strong>
+                        </div>
+
+                    </div>
+
+
+                    <div class="mini-stat-card">
+
+                        <i class="bi bi-list-check"></i>
+
+                        <div>
+                            <span>Total Tasks</span>
+
+                            <strong id="dashboardTaskCount">
+                                0
+                            </strong>
+                        </div>
+
+                    </div>
+
+
+                    <div class="mini-stat-card">
+
+                        <i class="bi bi-hourglass-split"></i>
+
+                        <div>
+                            <span>Active Tasks</span>
+
+                            <strong id="dashboardActiveTasks">
+                                0
+                            </strong>
+                        </div>
+
+                    </div>
+
+
+                    <div class="mini-stat-card">
+
+                        <i class="bi bi-check-circle-fill"></i>
+
+                        <div>
+                            <span>Completed Tasks</span>
+
+                            <strong id="dashboardCompletedTasks">
+                                0
+                            </strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
                 <!-- Dashboard columns -->
 
                 <div class="dashboard-grid">
@@ -421,6 +505,41 @@
                         ></div>
 
                     </div>
+
+                </div>
+
+
+                <!-- Recent Tasks -->
+
+                <div class="dashboard-card dashboard-task-card">
+
+                    <div class="card-header">
+
+                        <div>
+                            <h3>
+                                Recent Tasks
+                            </h3>
+
+                            <p>
+                                Latest team activities
+                            </p>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="text-btn"
+                            data-section-link="tasks"
+                        >
+                            View All
+                            <i class="bi bi-arrow-right"></i>
+                        </button>
+
+                    </div>
+
+                    <div
+                        id="dashboardTasks"
+                        class="dashboard-task-list"
+                    ></div>
 
                 </div>
 
@@ -575,6 +694,409 @@
                     >
                         <i class="bi bi-plus-lg"></i>
                         Add Job
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <!-- =========================
+                 TASKS
+            ========================== -->
+
+            <section
+                id="tasks"
+                class="page-section"
+            >
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <p class="section-label">
+                            WORK MANAGEMENT
+                        </p>
+
+                        <h2>
+                            Tasks
+                        </h2>
+
+                        <p>
+                            Create, assign and track your team's work.
+                        </p>
+
+                    </div>
+
+                    <button
+                        type="button"
+                        class="primary-btn"
+                        id="addTaskBtn"
+                    >
+                        <i class="bi bi-plus-lg"></i>
+                        Add Task
+                    </button>
+
+                </div>
+
+
+                <!-- Task stats -->
+
+                <div class="mini-stats-grid">
+
+                    <div class="mini-stat-card">
+
+                        <i class="bi bi-list-task"></i>
+
+                        <div>
+                            <span>Total Tasks</span>
+
+                            <strong id="totalTasks">
+                                0
+                            </strong>
+                        </div>
+
+                    </div>
+
+
+                    <div class="mini-stat-card">
+
+                        <i class="bi bi-arrow-repeat"></i>
+
+                        <div>
+                            <span>In Progress</span>
+
+                            <strong id="inProgressTasks">
+                                0
+                            </strong>
+                        </div>
+
+                    </div>
+
+
+                    <div class="mini-stat-card">
+
+                        <i class="bi bi-clock"></i>
+
+                        <div>
+                            <span>Pending</span>
+
+                            <strong id="pendingTasks">
+                                0
+                            </strong>
+                        </div>
+
+                    </div>
+
+
+                    <div class="mini-stat-card">
+
+                        <i class="bi bi-check-circle"></i>
+
+                        <div>
+                            <span>Completed</span>
+
+                            <strong id="completedTasks">
+                                0
+                            </strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Task filters -->
+
+                <div class="filter-bar">
+
+                    <div class="search-box">
+
+                        <i class="bi bi-search"></i>
+
+                        <input
+                            type="search"
+                            id="taskSearch"
+                            placeholder="Search tasks..."
+                        >
+
+                    </div>
+
+
+                    <div class="filter-select">
+
+                        <i class="bi bi-funnel"></i>
+
+                        <select id="taskStatusFilter">
+
+                            <option value="all">
+                                All Status
+                            </option>
+
+                            <option value="todo">
+                                To Do
+                            </option>
+
+                            <option value="progress">
+                                In Progress
+                            </option>
+
+                            <option value="review">
+                                Review
+                            </option>
+
+                            <option value="completed">
+                                Completed
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="filter-select">
+
+                        <i class="bi bi-flag"></i>
+
+                        <select id="taskPriorityFilter">
+
+                            <option value="all">
+                                All Priorities
+                            </option>
+
+                            <option value="urgent">
+                                Urgent
+                            </option>
+
+                            <option value="high">
+                                High
+                            </option>
+
+                            <option value="medium">
+                                Medium
+                            </option>
+
+                            <option value="low">
+                                Low
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="filter-select">
+
+                        <i class="bi bi-person"></i>
+
+                        <select id="taskMemberFilter">
+
+                            <option value="all">
+                                All Members
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Tasks -->
+
+                <div
+                    id="tasksGrid"
+                    class="tasks-grid"
+                ></div>
+
+
+                <div
+                    id="emptyTasks"
+                    class="empty-state hidden"
+                >
+
+                    <div class="empty-icon">
+                        <i class="bi bi-check2-square"></i>
+                    </div>
+
+                    <h3>
+                        No tasks found
+                    </h3>
+
+                    <p>
+                        Create a task to start managing your team's work.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="primary-btn"
+                        id="emptyAddTaskBtn"
+                    >
+                        <i class="bi bi-plus-lg"></i>
+                        Add Task
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <!-- =========================
+                 TEAM
+            ========================== -->
+
+            <section
+                id="team"
+                class="page-section"
+            >
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <p class="section-label">
+                            TEAM
+                        </p>
+
+                        <h2>
+                            Team Members
+                        </h2>
+
+                        <p>
+                            Manage your team and keep track of everyone's work.
+                        </p>
+
+                    </div>
+
+                    <button
+                        type="button"
+                        class="primary-btn"
+                        id="addMemberBtn"
+                    >
+                        <i class="bi bi-person-plus"></i>
+                        Add Member
+                    </button>
+
+                </div>
+
+
+                <!-- Team stats -->
+
+                <div class="mini-stats-grid">
+
+                    <div class="mini-stat-card">
+
+                        <i class="bi bi-people-fill"></i>
+
+                        <div>
+                            <span>Total Members</span>
+
+                            <strong id="totalTeamMembers">
+                                0
+                            </strong>
+                        </div>
+
+                    </div>
+
+
+                    <div class="mini-stat-card">
+
+                        <i class="bi bi-person-check-fill"></i>
+
+                        <div>
+                            <span>Active Members</span>
+
+                            <strong id="activeTeamMembers">
+                                0
+                            </strong>
+                        </div>
+
+                    </div>
+
+
+                    <div class="mini-stat-card">
+
+                        <i class="bi bi-list-check"></i>
+
+                        <div>
+                            <span>Assigned Tasks</span>
+
+                            <strong id="assignedTeamTasks">
+                                0
+                            </strong>
+                        </div>
+
+                    </div>
+
+
+                    <div class="mini-stat-card">
+
+                        <i class="bi bi-check-circle-fill"></i>
+
+                        <div>
+                            <span>Completed Tasks</span>
+
+                            <strong id="teamCompletedTasks">
+                                0
+                            </strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Team search -->
+
+                <div class="filter-bar single-filter">
+
+                    <div class="search-box">
+
+                        <i class="bi bi-search"></i>
+
+                        <input
+                            type="search"
+                            id="teamSearch"
+                            placeholder="Search team members..."
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Team members -->
+
+                <div
+                    id="teamGrid"
+                    class="team-grid"
+                ></div>
+
+
+                <div
+                    id="emptyTeam"
+                    class="empty-state hidden"
+                >
+
+                    <div class="empty-icon">
+                        <i class="bi bi-people"></i>
+                    </div>
+
+                    <h3>
+                        No team members yet
+                    </h3>
+
+                    <p>
+                        Add your first team member to start assigning tasks.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="primary-btn"
+                        id="emptyAddMemberBtn"
+                    >
+                        <i class="bi bi-person-plus"></i>
+                        Add Member
                     </button>
 
                 </div>
@@ -854,8 +1376,7 @@
                             </h3>
 
                             <p>
-                                Clients can copy a wallet address
-                                for payment.
+                                Clients can copy a wallet address for payment.
                             </p>
 
                         </div>
@@ -1030,7 +1551,7 @@
                         <i class="bi bi-info-circle"></i>
 
                         <span>
-                           Always verify the wallet address and make sure you are sending on the Solana blockchain. A mistake may result in permanent loss of funds.
+                            Always verify the wallet address and make sure you are sending on the Solana blockchain. A mistake may result in permanent loss of funds.
                         </span>
 
                     </div>
@@ -1205,8 +1726,7 @@
                             </h3>
 
                             <p>
-                                Your projects and clients are saved
-                                in your browser.
+                                Your projects, clients, team members and tasks are saved in your browser.
                             </p>
 
                             <span class="storage-status">
@@ -1232,9 +1752,8 @@
                             </h3>
 
                             <p>
-                                JOBTRACK is a freelance job and client tracker
-                                built with HTML, CSS and JavaScript. It was built by Mubarak sani (Mubeeey)
-
+                                JOBTRACK is a freelance job, client and team tracker built with HTML, CSS and JavaScript. It was built by Mubarak Sani (Mubeeey).
+                                <br><br>
                                 Developer email: Mubeeeykat@gmail.com
                             </p>
 
@@ -1703,6 +2222,454 @@
                     >
                         <i class="bi bi-check-lg"></i>
                         Save Client
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         TEAM MEMBER MODAL
+    ========================== -->
+
+    <div
+        class="modal-overlay"
+        id="memberModal"
+    >
+
+        <div class="modal">
+
+            <div class="modal-header">
+
+                <div>
+
+                    <p class="modal-label">
+                        TEAM
+                    </p>
+
+                    <h3 id="memberModalTitle">
+                        Add Team Member
+                    </h3>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="modal-close"
+                    id="closeMemberModal"
+                >
+                    <i class="bi bi-x-lg"></i>
+                </button>
+
+            </div>
+
+
+            <form id="memberForm">
+
+                <input
+                    type="hidden"
+                    id="memberId"
+                >
+
+
+                <div class="form-group">
+
+                    <label for="memberName">
+                        Full Name
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i class="bi bi-person"></i>
+
+                        <input
+                            type="text"
+                            id="memberName"
+                            placeholder="e.g. Mubeeey"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="memberRole">
+                        Role
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i class="bi bi-briefcase"></i>
+
+                        <input
+                            type="text"
+                            id="memberRole"
+                            placeholder="e.g. Community Manager"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="memberEmail">
+                        Email
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i class="bi bi-envelope"></i>
+
+                        <input
+                            type="email"
+                            id="memberEmail"
+                            placeholder="member@example.com"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="memberStatus">
+                        Status
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i class="bi bi-circle-half"></i>
+
+                        <select id="memberStatus">
+
+                            <option value="active">
+                                Active
+                            </option>
+
+                            <option value="inactive">
+                                Inactive
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="memberNotes">
+                        Notes
+                    </label>
+
+                    <textarea
+                        id="memberNotes"
+                        rows="3"
+                        placeholder="Add notes about this team member..."
+                    ></textarea>
+
+                </div>
+
+
+                <div class="modal-actions">
+
+                    <button
+                        type="button"
+                        class="secondary-btn"
+                        id="cancelMemberBtn"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="primary-btn"
+                    >
+                        <i class="bi bi-check-lg"></i>
+                        Save Member
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         TASK MODAL
+    ========================== -->
+
+    <div
+        class="modal-overlay"
+        id="taskModal"
+    >
+
+        <div class="modal">
+
+            <div class="modal-header">
+
+                <div>
+
+                    <p class="modal-label">
+                        TASK
+                    </p>
+
+                    <h3 id="taskModalTitle">
+                        Create New Task
+                    </h3>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="modal-close"
+                    id="closeTaskModal"
+                >
+                    <i class="bi bi-x-lg"></i>
+                </button>
+
+            </div>
+
+
+            <form id="taskForm">
+
+                <input
+                    type="hidden"
+                    id="taskId"
+                >
+
+
+                <div class="form-group">
+
+                    <label for="taskTitle">
+                        Task Title
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i class="bi bi-check2-square"></i>
+
+                        <input
+                            type="text"
+                            id="taskTitle"
+                            placeholder="e.g. Create VCC X post"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="taskDescription">
+                        Description
+                    </label>
+
+                    <textarea
+                        id="taskDescription"
+                        rows="3"
+                        placeholder="Describe what needs to be done..."
+                    ></textarea>
+
+                </div>
+
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label for="taskProject">
+                            Project
+                        </label>
+
+                        <div class="input-wrapper">
+
+                            <i class="bi bi-kanban"></i>
+
+                            <select id="taskProject">
+
+                                <option value="">
+                                    Select project
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="taskAssignee">
+                            Assign To
+                        </label>
+
+                        <div class="input-wrapper">
+
+                            <i class="bi bi-person"></i>
+
+                            <select id="taskAssignee">
+
+                                <option value="">
+                                    Select member
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label for="taskPriority">
+                            Priority
+                        </label>
+
+                        <div class="input-wrapper">
+
+                            <i class="bi bi-flag"></i>
+
+                            <select id="taskPriority">
+
+                                <option value="low">
+                                    Low
+                                </option>
+
+                                <option
+                                    value="medium"
+                                    selected
+                                >
+                                    Medium
+                                </option>
+
+                                <option value="high">
+                                    High
+                                </option>
+
+                                <option value="urgent">
+                                    Urgent
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="taskDueDate">
+                            Due Date
+                        </label>
+
+                        <div class="input-wrapper">
+
+                            <i class="bi bi-calendar3"></i>
+
+                            <input
+                                type="date"
+                                id="taskDueDate"
+                            >
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="taskStatus">
+                        Status
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i class="bi bi-circle-half"></i>
+
+                        <select id="taskStatus">
+
+                            <option value="todo">
+                                To Do
+                            </option>
+
+                            <option value="progress">
+                                In Progress
+                            </option>
+
+                            <option value="review">
+                                Review
+                            </option>
+
+                            <option value="completed">
+                                Completed
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="taskNotes">
+                        Notes
+                    </label>
+
+                    <textarea
+                        id="taskNotes"
+                        rows="3"
+                        placeholder="Add additional notes..."
+                    ></textarea>
+
+                </div>
+
+
+                <div class="modal-actions">
+
+                    <button
+                        type="button"
+                        class="secondary-btn"
+                        id="cancelTaskBtn"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="primary-btn"
+                    >
+                        <i class="bi bi-check-lg"></i>
+                        Save Task
                     </button>
 
                 </div>
