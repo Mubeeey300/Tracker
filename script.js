@@ -1,7 +1,26 @@
 /* =========================================================
-   JOBTRACK
-   COMPLETE APPLICATION JAVASCRIPT
-========================================================= */
+   JOBTRACK - COMPLETE JAVASCRIPT
+   =========================================================
+   Features:
+   - Projects
+   - Clients
+   - Team Members
+   - Tasks
+   - Payments
+   - Calendar / Deadlines
+   - Dashboard
+   - Search & Filters
+   - Dark / Light Theme
+   - LocalStorage
+   - Mobile Sidebar
+   - Permission Control
+
+   TASKS + TEAM ACCESS:
+   Only:
+   - Mubeeey
+   - Skyboy
+   - Joby
+   ========================================================= */
 
 
 /* =========================================================
@@ -84,685 +103,226 @@ const defaultClients = [
 ];
 
 
-/*
- * We intentionally start Team and Tasks empty.
- * You can add your real team members and tasks
- * through the application.
- */
-
 const defaultTeamMembers = [];
 
 const defaultTasks = [];
 
 
 /* =========================================================
-   LOCAL STORAGE
+   STORAGE
 ========================================================= */
 
-let jobs = loadStorage(
-    "jobTrackJobs",
-    defaultJobs
-);
+const STORAGE_KEYS = {
 
-let clients = loadStorage(
-    "jobTrackClients",
-    defaultClients
-);
+    jobs: "jobTrackJobs",
+    clients: "jobTrackClients",
+    team: "jobTrackTeam",
+    tasks: "jobTrackTasks",
+    theme: "jobTrackTheme"
 
-let teamMembers = loadStorage(
-    "jobTrackTeam",
-    defaultTeamMembers
-);
-
-let tasks = loadStorage(
-    "jobTrackTasks",
-    defaultTasks
-);
+};
 
 
-function loadStorage(key, fallback) {
+/* =========================================================
+   LOAD DATA
+========================================================= */
 
-    try {
+let jobs = JSON.parse(
+    localStorage.getItem(STORAGE_KEYS.jobs)
+) || defaultJobs;
 
-        const saved =
-            localStorage.getItem(key);
+let clients = JSON.parse(
+    localStorage.getItem(STORAGE_KEYS.clients)
+) || defaultClients;
 
-        if (!saved) {
-            return fallback;
-        }
+let teamMembers = JSON.parse(
+    localStorage.getItem(STORAGE_KEYS.team)
+) || defaultTeamMembers;
 
-        const parsed =
-            JSON.parse(saved);
-
-        return Array.isArray(parsed)
-            ? parsed
-            : fallback;
-
-    } catch (error) {
-
-        console.error(
-            `Could not load ${key}:`,
-            error
-        );
-
-        return fallback;
-
-    }
-
-}
+let tasks = JSON.parse(
+    localStorage.getItem(STORAGE_KEYS.tasks)
+) || defaultTasks;
 
 
-function saveJobs() {
+/* =========================================================
+   CURRENT USER / PERMISSIONS
+========================================================= */
 
-    localStorage.setItem(
-        "jobTrackJobs",
-        JSON.stringify(jobs)
-    );
+/*
+   Change this name to test different users.
 
-}
+   Only these three users can manage:
+   - Tasks
+   - Team Members
+*/
+
+let currentUser = {
+    name: "Mubeeey",
+    role: "admin"
+};
 
 
-function saveClients() {
+const ADMIN_USERS = [
+    "Mubeeey",
+    "Skyboy",
+    "Joby"
+];
 
-    localStorage.setItem(
-        "jobTrackClients",
-        JSON.stringify(clients)
+
+function isAdmin() {
+
+    return ADMIN_USERS.some(
+        user =>
+            user.toLowerCase() ===
+            currentUser.name.toLowerCase()
     );
 
 }
 
 
-function saveTeamMembers() {
+function canManageTasks() {
 
-    localStorage.setItem(
-        "jobTrackTeam",
-        JSON.stringify(teamMembers)
-    );
+    return isAdmin();
 
 }
 
 
-function saveTasks() {
+function canManageTeam() {
 
-    localStorage.setItem(
-        "jobTrackTasks",
-        JSON.stringify(tasks)
-    );
+    return isAdmin();
 
 }
 
 
 /* =========================================================
-   DOM
+   PERMISSION MESSAGE
 ========================================================= */
 
-const pageTitle =
-    document.getElementById("pageTitle");
+function showPermissionDenied(feature = "this section") {
 
-const pageSections =
-    document.querySelectorAll(".page-section");
-
-const navLinks =
-    document.querySelectorAll(
-        ".nav-link[data-section]"
+    alert(
+        `Access denied.\n\nOnly Mubeeey, Skyboy, and Joby can access ${feature}.`
     );
-
-const currentDate =
-    document.getElementById("currentDate");
-
-
-/* =========================================================
-   DASHBOARD DOM
-========================================================= */
-
-const totalJobs =
-    document.getElementById("totalJobs");
-
-const completedJobs =
-    document.getElementById("completedJobs");
-
-const outstandingAmount =
-    document.getElementById("outstandingAmount");
-
-const totalPaid =
-    document.getElementById("totalPaid");
-
-const recentProjects =
-    document.getElementById("recentProjects");
-
-const dashboardClients =
-    document.getElementById("dashboardClients");
-
-const dashboardTeamCount =
-    document.getElementById(
-        "dashboardTeamCount"
-    );
-
-const dashboardTaskCount =
-    document.getElementById(
-        "dashboardTaskCount"
-    );
-
-const dashboardActiveTasks =
-    document.getElementById(
-        "dashboardActiveTasks"
-    );
-
-const dashboardCompletedTasks =
-    document.getElementById(
-        "dashboardCompletedTasks"
-    );
-
-const dashboardTasks =
-    document.getElementById(
-        "dashboardTasks"
-    );
-
-
-/* =========================================================
-   PROJECT DOM
-========================================================= */
-
-const jobsGrid =
-    document.getElementById("jobsGrid");
-
-const emptyJobs =
-    document.getElementById("emptyJobs");
-
-const jobSearch =
-    document.getElementById("jobSearch");
-
-const statusFilter =
-    document.getElementById("statusFilter");
-
-const paymentFilter =
-    document.getElementById("paymentFilter");
-
-
-/* =========================================================
-   CLIENT DOM
-========================================================= */
-
-const clientsGrid =
-    document.getElementById("clientsGrid");
-
-const emptyClients =
-    document.getElementById("emptyClients");
-
-const clientSearch =
-    document.getElementById("clientSearch");
-
-const totalClients =
-    document.getElementById("totalClients");
-
-const activeClients =
-    document.getElementById("activeClients");
-
-const completedClients =
-    document.getElementById("completedClients");
-
-
-/* =========================================================
-   TEAM DOM
-========================================================= */
-
-const teamGrid =
-    document.getElementById("teamGrid");
-
-const emptyTeam =
-    document.getElementById("emptyTeam");
-
-const teamSearch =
-    document.getElementById("teamSearch");
-
-const totalTeamMembers =
-    document.getElementById(
-        "totalTeamMembers"
-    );
-
-const activeTeamMembers =
-    document.getElementById(
-        "activeTeamMembers"
-    );
-
-const assignedTeamTasks =
-    document.getElementById(
-        "assignedTeamTasks"
-    );
-
-const teamCompletedTasks =
-    document.getElementById(
-        "teamCompletedTasks"
-    );
-
-
-/* =========================================================
-   TASK DOM
-========================================================= */
-
-const tasksGrid =
-    document.getElementById("tasksGrid");
-
-const emptyTasks =
-    document.getElementById("emptyTasks");
-
-const taskSearch =
-    document.getElementById("taskSearch");
-
-const taskStatusFilter =
-    document.getElementById(
-        "taskStatusFilter"
-    );
-
-const taskPriorityFilter =
-    document.getElementById(
-        "taskPriorityFilter"
-    );
-
-const taskMemberFilter =
-    document.getElementById(
-        "taskMemberFilter"
-    );
-
-const totalTasks =
-    document.getElementById("totalTasks");
-
-const inProgressTasks =
-    document.getElementById(
-        "inProgressTasks"
-    );
-
-const pendingTasks =
-    document.getElementById(
-        "pendingTasks"
-    );
-
-const completedTasks =
-    document.getElementById(
-        "completedTasks"
-    );
-
-
-/* =========================================================
-   PAYMENT DOM
-========================================================= */
-
-const totalProjectValue =
-    document.getElementById(
-        "totalProjectValue"
-    );
-
-const paymentTotalPaid =
-    document.getElementById(
-        "paymentTotalPaid"
-    );
-
-const paymentOutstanding =
-    document.getElementById(
-        "paymentOutstanding"
-    );
-
-const paymentList =
-    document.getElementById("paymentList");
-
-
-/* =========================================================
-   CALENDAR DOM
-========================================================= */
-
-const deadlineList =
-    document.getElementById("deadlineList");
-
-
-/* =========================================================
-   THEME DOM
-========================================================= */
-
-const themeToggle =
-    document.getElementById("themeToggle");
-
-const topThemeToggle =
-    document.getElementById(
-        "topThemeToggle"
-    );
-
-const settingsThemeToggle =
-    document.getElementById(
-        "settingsThemeToggle"
-    );
-
-
-/* =========================================================
-   MOBILE DOM
-========================================================= */
-
-const mobileMenuBtn =
-    document.getElementById(
-        "mobileMenuBtn"
-    );
-
-const sidebar =
-    document.getElementById("sidebar");
-
-const sidebarOverlay =
-    document.getElementById(
-        "sidebarOverlay"
-    );
-
-
-/* =========================================================
-   JOB MODAL DOM
-========================================================= */
-
-const jobModal =
-    document.getElementById("jobModal");
-
-const jobForm =
-    document.getElementById("jobForm");
-
-const jobModalTitle =
-    document.getElementById(
-        "jobModalTitle"
-    );
-
-const jobId =
-    document.getElementById("jobId");
-
-const jobName =
-    document.getElementById("jobName");
-
-const jobClient =
-    document.getElementById("jobClient");
-
-const jobBudget =
-    document.getElementById("jobBudget");
-
-const jobPaid =
-    document.getElementById("jobPaid");
-
-const jobDeadline =
-    document.getElementById(
-        "jobDeadline"
-    );
-
-const jobStatus =
-    document.getElementById("jobStatus");
-
-const jobProgress =
-    document.getElementById(
-        "jobProgress"
-    );
-
-const progressValue =
-    document.getElementById(
-        "progressValue"
-    );
-
-const previewPaymentStatus =
-    document.getElementById(
-        "previewPaymentStatus"
-    );
-
-const previewRemaining =
-    document.getElementById(
-        "previewRemaining"
-    );
-
-
-/* =========================================================
-   CLIENT MODAL DOM
-========================================================= */
-
-const clientModal =
-    document.getElementById(
-        "clientModal"
-    );
-
-const clientForm =
-    document.getElementById(
-        "clientForm"
-    );
-
-const clientModalTitle =
-    document.getElementById(
-        "clientModalTitle"
-    );
-
-const clientId =
-    document.getElementById(
-        "clientId"
-    );
-
-const clientName =
-    document.getElementById(
-        "clientName"
-    );
-
-const clientEmail =
-    document.getElementById(
-        "clientEmail"
-    );
-
-const clientPhone =
-    document.getElementById(
-        "clientPhone"
-    );
-
-const clientCompany =
-    document.getElementById(
-        "clientCompany"
-    );
-
-const clientNotes =
-    document.getElementById(
-        "clientNotes"
-    );
-
-
-/* =========================================================
-   TEAM MODAL DOM
-========================================================= */
-
-const memberModal =
-    document.getElementById(
-        "memberModal"
-    );
-
-const memberForm =
-    document.getElementById(
-        "memberForm"
-    );
-
-const memberModalTitle =
-    document.getElementById(
-        "memberModalTitle"
-    );
-
-const memberId =
-    document.getElementById(
-        "memberId"
-    );
-
-const memberName =
-    document.getElementById(
-        "memberName"
-    );
-
-const memberRole =
-    document.getElementById(
-        "memberRole"
-    );
-
-const memberEmail =
-    document.getElementById(
-        "memberEmail"
-    );
-
-const memberStatus =
-    document.getElementById(
-        "memberStatus"
-    );
-
-const memberNotes =
-    document.getElementById(
-        "memberNotes"
-    );
-
-
-/* =========================================================
-   TASK MODAL DOM
-========================================================= */
-
-const taskModal =
-    document.getElementById(
-        "taskModal"
-    );
-
-const taskForm =
-    document.getElementById(
-        "taskForm"
-    );
-
-const taskModalTitle =
-    document.getElementById(
-        "taskModalTitle"
-    );
-
-const taskId =
-    document.getElementById(
-        "taskId"
-    );
-
-const taskTitle =
-    document.getElementById(
-        "taskTitle"
-    );
-
-const taskDescription =
-    document.getElementById(
-        "taskDescription"
-    );
-
-const taskProject =
-    document.getElementById(
-        "taskProject"
-    );
-
-const taskAssignee =
-    document.getElementById(
-        "taskAssignee"
-    );
-
-const taskPriority =
-    document.getElementById(
-        "taskPriority"
-    );
-
-const taskDueDate =
-    document.getElementById(
-        "taskDueDate"
-    );
-
-const taskStatus =
-    document.getElementById(
-        "taskStatus"
-    );
-
-const taskNotes =
-    document.getElementById(
-        "taskNotes"
-    );
-
-
-/* =========================================================
-   DATE
-========================================================= */
-
-function updateCurrentDate() {
-
-    if (!currentDate) {
-        return;
-    }
-
-    currentDate.textContent =
-        new Date().toLocaleDateString(
-            "en-NG",
-            {
-                weekday: "short",
-                day: "numeric",
-                month: "short",
-                year: "numeric"
-            }
-        );
 
 }
+
+
+/* =========================================================
+   DOM HELPERS
+========================================================= */
+
+const $ = selector => document.querySelector(selector);
+
+const $$ = selector => document.querySelectorAll(selector);
+
+
+/* =========================================================
+   SECTION TITLES
+========================================================= */
+
+const sectionTitles = {
+
+    dashboard: "Dashboard",
+    projects: "Projects",
+    tasks: "Tasks",
+    team: "Team",
+    clients: "Clients",
+    payments: "Payments",
+    calendar: "Calendar",
+    settings: "Settings"
+
+};
 
 
 /* =========================================================
    NAVIGATION
 ========================================================= */
 
-const sectionTitles = {
-
-    dashboard: "Dashboard",
-
-    projects: "Projects",
-
-    tasks: "Tasks",
-
-    team: "Team",
-
-    clients: "Clients",
-
-    payments: "Payments",
-
-    calendar: "Calendar",
-
-    settings: "Settings"
-
-};
-
-
 function showSection(sectionName) {
 
-    if (!document.getElementById(sectionName)) {
+    /*
+       Prevent unauthorized users from entering Tasks.
+    */
 
-        sectionName =
-            "dashboard";
+    if (
+        sectionName === "tasks" &&
+        !canManageTasks()
+    ) {
+
+        showPermissionDenied("Tasks");
+
+        return;
 
     }
 
 
-    pageSections.forEach(section => {
+    /*
+       Prevent unauthorized users from entering Team.
+    */
 
-        section.classList.toggle(
-            "active",
-            section.id === sectionName
-        );
+    if (
+        sectionName === "team" &&
+        !canManageTeam()
+    ) {
+
+        showPermissionDenied("Team management");
+
+        return;
+
+    }
+
+
+    $$(".page-section").forEach(section => {
+
+        section.classList.remove("active");
 
     });
 
 
-    navLinks.forEach(link => {
+    const targetSection =
+        $(`#${sectionName}`) ||
+        $(`[data-section="${sectionName}"]`);
 
-        link.classList.toggle(
-            "active",
-            link.dataset.section ===
-            sectionName
-        );
+
+    if (targetSection) {
+
+        targetSection.classList.add("active");
+
+    }
+
+
+    $$(".nav-link").forEach(link => {
+
+        link.classList.remove("active");
+
+        if (
+            link.dataset.section === sectionName
+        ) {
+
+            link.classList.add("active");
+
+        }
 
     });
 
+
+    const title =
+        sectionTitles[sectionName] ||
+        "JobTrack";
+
+
+    const pageTitle = $("#pageTitle");
 
     if (pageTitle) {
 
-        pageTitle.textContent =
-            sectionTitles[
-                sectionName
-            ] || "Dashboard";
+        pageTitle.textContent = title;
 
     }
 
+
+    /*
+       Render section data.
+    */
 
     switch (sectionName) {
 
@@ -780,13 +340,9 @@ function showSection(sectionName) {
             break;
 
 
-        case "tasks":
+        case "clients":
 
-            populateTaskProjectOptions();
-
-            populateTaskMemberOptions();
-
-            filterTasks();
+            filterClients();
 
             break;
 
@@ -798,9 +354,9 @@ function showSection(sectionName) {
             break;
 
 
-        case "clients":
+        case "tasks":
 
-            filterClients();
+            filterTasks();
 
             break;
 
@@ -821,79 +377,178 @@ function showSection(sectionName) {
     }
 
 
-    if (window.innerWidth <= 800) {
+    /*
+       Close mobile menu.
+    */
 
-        closeMobileSidebar();
-
-    }
+    closeMobileSidebar();
 
 
-    if (
-        window.location.hash !==
+    /*
+       Update URL hash.
+    */
+
+    history.replaceState(
+        null,
+        "",
         `#${sectionName}`
-    ) {
-
-        history.replaceState(
-            null,
-            "",
-            `#${sectionName}`
-        );
-
-    }
+    );
 
 }
 
 
+/* =========================================================
+   NAVIGATION EVENTS
+========================================================= */
+
+const navLinks = $$(".nav-link");
+
 navLinks.forEach(link => {
 
-    link.addEventListener(
-        "click",
-        event => {
+    link.addEventListener("click", event => {
 
-            event.preventDefault();
+        event.preventDefault();
 
-            showSection(
-                link.dataset.section
-            );
+        const section =
+            link.dataset.section;
+
+        if (section) {
+
+            showSection(section);
 
         }
-    );
+
+    });
 
 });
 
 
-document
-    .querySelectorAll(
-        "[data-section-link]"
-    )
-    .forEach(button => {
+$$("[data-section-link]").forEach(link => {
 
-        button.addEventListener(
-            "click",
-            () => {
+    link.addEventListener("click", event => {
 
-                showSection(
-                    button.dataset.sectionLink
-                );
+        event.preventDefault();
 
-            }
-        );
+        const section =
+            link.dataset.sectionLink;
+
+        if (section) {
+
+            showSection(section);
+
+        }
+
+    });
+
+});
+
+
+/* =========================================================
+   UPDATE PERMISSION UI
+========================================================= */
+
+function updatePermissionUI() {
+
+    const taskAllowed =
+        canManageTasks();
+
+    const teamAllowed =
+        canManageTeam();
+
+
+    /*
+       Hide Tasks navigation for unauthorized users.
+    */
+
+    $$('[data-section="tasks"]').forEach(link => {
+
+        link.style.display =
+            taskAllowed ? "" : "none";
 
     });
 
 
+    /*
+       Hide Team navigation for unauthorized users.
+    */
+
+    $$('[data-section="team"]').forEach(link => {
+
+        link.style.display =
+            teamAllowed ? "" : "none";
+
+    });
+
+
+    /*
+       Hide task add buttons.
+    */
+
+    const taskButtons = [
+
+        "#addTaskBtn",
+        "#emptyAddTaskBtn"
+
+    ];
+
+
+    taskButtons.forEach(selector => {
+
+        const button = $(selector);
+
+        if (button) {
+
+            button.style.display =
+                taskAllowed ? "" : "none";
+
+        }
+
+    });
+
+
+    /*
+       Hide team add buttons.
+    */
+
+    const teamButtons = [
+
+        "#addMemberBtn",
+        "#emptyAddMemberBtn"
+
+    ];
+
+
+    teamButtons.forEach(selector => {
+
+        const button = $(selector);
+
+        if (button) {
+
+            button.style.display =
+                teamAllowed ? "" : "none";
+
+        }
+
+    });
+
+}
+
+
+/* =========================================================
+   HASH NAVIGATION
+========================================================= */
+
 function loadHashSection() {
 
-    const section =
-        window.location.hash.replace(
-            "#",
-            ""
-        );
+    const hash =
+        window.location.hash.replace("#", "");
 
+    if (
+        hash &&
+        sectionTitles[hash]
+    ) {
 
-    if (section) {
-
-        showSection(section);
+        showSection(hash);
 
     } else {
 
@@ -914,183 +569,137 @@ window.addEventListener(
    PROJECTS
 ========================================================= */
 
-function displayJobs(jobList) {
+function displayJobs(jobList = jobs) {
 
-    if (!jobsGrid) {
-        return;
-    }
+    const grid = $("#jobsGrid");
+
+    const empty = $("#emptyJobs");
+
+    if (!grid) return;
 
 
-    jobsGrid.innerHTML = "";
+    grid.innerHTML = "";
 
 
     if (!jobList.length) {
 
-        emptyJobs.classList.remove(
-            "hidden"
-        );
+        if (empty) {
+
+            empty.style.display = "";
+
+        }
 
         return;
 
     }
 
 
-    emptyJobs.classList.add(
-        "hidden"
-    );
+    if (empty) {
+
+        empty.style.display = "none";
+
+    }
 
 
     jobList.forEach(job => {
 
-        const budget =
-            Number(job.budget) || 0;
-
-        const paid =
-            Math.min(
-                Number(job.paid) || 0,
-                budget
-            );
-
-        const balance =
-            Math.max(
-                budget - paid,
-                0
-            );
-
-        const progress =
-            Math.min(
-                Math.max(
-                    Number(job.progress) || 0,
-                    0
-                ),
-                100
-            );
-
-
-        const status =
-            String(
-                job.status ||
-                "pending"
-            ).toLowerCase();
-
-
         const paymentStatus =
-            getPaymentStatus(
-                budget,
-                paid
+            getPaymentStatus(job);
+
+
+        const remaining =
+            Math.max(
+                0,
+                Number(job.budget || 0) -
+                Number(job.paid || 0)
             );
 
 
-        const card =
-            document.createElement(
-                "article"
-            );
-
+        const card = document.createElement("div");
 
         card.className =
-            "job-card";
+            "project-card";
 
 
         card.innerHTML = `
 
-            <div class="job-card-header">
+            <div class="project-card-header">
 
-                <div class="job-card-left">
+                <div class="project-icon">
 
-                    <div class="job-icon">
-
-                        <i class="bi ${safeIcon(
-                            job.icon
-                        )}"></i>
-
-                    </div>
-
-                    <div class="job-card-title">
-
-                        <h3>
-                            ${escapeHTML(
-                                job.name
-                            )}
-                        </h3>
-
-                        <div class="client-name">
-                            ${escapeHTML(
-                                job.client
-                            )}
-                        </div>
-
-                    </div>
+                    <i class="bi ${safeIcon(job.icon)}"></i>
 
                 </div>
 
-                <span class="status status-${safeStatus(
-                    status
-                )}">
+                <div class="project-actions">
 
-                    ${capitalize(
-                        status
-                    )}
+                    <button
+                        class="icon-btn edit-job"
+                        data-id="${job.id}"
+                        title="Edit"
+                    >
+                        <i class="bi bi-pencil"></i>
+                    </button>
 
+                    <button
+                        class="icon-btn delete-job"
+                        data-id="${job.id}"
+                        title="Delete"
+                    >
+                        <i class="bi bi-trash"></i>
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <h3>
+                ${escapeHTML(job.name)}
+            </h3>
+
+
+            <p class="project-client">
+
+                <i class="bi bi-building"></i>
+
+                ${escapeHTML(job.client)}
+
+            </p>
+
+
+            <div class="project-meta">
+
+                <span>
+                    Budget:
+                    ${formatMoney(job.budget)}
+                </span>
+
+                <span>
+                    Paid:
+                    ${formatMoney(job.paid)}
                 </span>
 
             </div>
 
 
-            <div class="job-details">
+            <div class="progress-wrapper">
 
-                <div class="job-detail">
+                <div class="progress-label">
 
-                    <span>
-                        Budget
-                    </span>
+                    <span>Progress</span>
 
                     <strong>
-                        ${formatMoney(
-                            budget
-                        )}
+                        ${Number(job.progress) || 0}%
                     </strong>
 
                 </div>
 
-
-                <div class="job-detail">
-
-                    <span>
-                        Paid
-                    </span>
-
-                    <strong class="payment-paid">
-
-                        ${formatMoney(
-                            paid
-                        )}
-
-                    </strong>
-
-                </div>
-
-            </div>
-
-
-            <div class="progress-section">
-
-                <div class="progress-top">
-
-                    <span>
-                        Progress
-                    </span>
-
-                    <strong>
-                        ${progress}%
-                    </strong>
-
-                </div>
-
-                <div class="progress-bar">
+                <div class="progress">
 
                     <div
-                        class="progress-fill"
-                        style="width:${progress}%"
+                        class="progress-bar"
+                        style="width:${Number(job.progress) || 0}%"
                     ></div>
 
                 </div>
@@ -1098,90 +707,41 @@ function displayJobs(jobList) {
             </div>
 
 
-            <div class="payment-info">
+            <div class="project-footer">
 
-                <div class="payment-row">
+                <span class="status-badge ${safeStatus(job.status)}">
 
-                    <span>
-                        Payment
-                    </span>
+                    ${capitalize(job.status)}
 
-                    <strong>
-                        ${paymentStatus}
-                    </strong>
+                </span>
 
-                </div>
+                <span>
 
+                    <i class="bi bi-calendar3"></i>
 
-                <div class="payment-row">
+                    ${formatDate(job.deadline)}
 
-                    <span>
-                        Remaining
-                    </span>
-
-                    <strong class="${
-                        balance > 0
-                            ? "payment-due"
-                            : "payment-paid"
-                    }">
-
-                        ${formatMoney(
-                            balance
-                        )}
-
-                    </strong>
-
-                </div>
+                </span>
 
             </div>
 
 
-            <div class="job-footer">
+            <div class="payment-status ${paymentStatus.class}">
 
-                <div class="deadline">
+                <span>
+                    ${paymentStatus.label}
+                </span>
 
-                    <i class="bi bi-calendar3"></i>
-
-                    ${formatDate(
-                        job.deadline
-                    )}
-
-                </div>
-
-
-                <div class="card-actions">
-
-                    <button
-                        type="button"
-                        class="card-btn edit-job"
-                        data-id="${job.id}"
-                        title="Edit"
-                    >
-
-                        <i class="bi bi-pencil"></i>
-
-                    </button>
-
-
-                    <button
-                        type="button"
-                        class="card-btn delete delete-job"
-                        data-id="${job.id}"
-                        title="Delete"
-                    >
-
-                        <i class="bi bi-trash"></i>
-
-                    </button>
-
-                </div>
+                <strong>
+                    ${formatMoney(remaining)}
+                </strong>
 
             </div>
 
         `;
 
 
-        jobsGrid.appendChild(card);
+        grid.appendChild(card);
 
     });
 
@@ -1193,104 +753,85 @@ function displayJobs(jobList) {
 
 function attachJobActions() {
 
-    document
-        .querySelectorAll(".edit-job")
-        .forEach(button => {
+    $$(".edit-job").forEach(button => {
 
-            button.addEventListener(
-                "click",
-                () => {
+        button.addEventListener("click", () => {
 
-                    editJob(
-                        Number(
-                            button.dataset.id
-                        )
-                    );
-
-                }
-            );
+            editJob(Number(button.dataset.id));
 
         });
 
+    });
 
-    document
-        .querySelectorAll(".delete-job")
-        .forEach(button => {
 
-            button.addEventListener(
-                "click",
-                () => {
+    $$(".delete-job").forEach(button => {
 
-                    deleteJob(
-                        Number(
-                            button.dataset.id
-                        )
-                    );
+        button.addEventListener("click", () => {
 
-                }
-            );
+            deleteJob(Number(button.dataset.id));
 
         });
+
+    });
 
 }
 
 
-function getPaymentStatus(
-    budget,
-    paid
-) {
+/* =========================================================
+   PAYMENT STATUS
+========================================================= */
 
-    if (budget <= 0) {
+function getPaymentStatus(job) {
 
-        return "Payment Pending";
+    const budget =
+        Number(job.budget) || 0;
 
-    }
+    const paid =
+        Number(job.paid) || 0;
 
 
     if (paid >= budget) {
 
-        return "Fully Paid";
+        return {
+            label: "Fully Paid",
+            class: "paid"
+        };
 
     }
 
 
     if (paid > 0) {
 
-        return "Partially Paid";
+        return {
+            label: "Partially Paid",
+            class: "partial"
+        };
 
     }
 
 
-    return "Payment Pending";
+    return {
+        label: "Unpaid",
+        class: "unpaid"
+    };
 
 }
 
 
+/* =========================================================
+   PROJECT STATS
+========================================================= */
+
 function updateStats() {
 
-    const total =
+    const totalJobs =
         jobs.length;
 
 
-    const completed =
+    const completedJobs =
         jobs.filter(
-            job =>
-                String(job.status)
-                    .toLowerCase() ===
-                "completed"
+            job => job.status === "completed"
         ).length;
-
-
-    const paid =
-        jobs.reduce(
-            (sum, job) =>
-                sum +
-                Math.min(
-                    Number(job.paid) || 0,
-                    Number(job.budget) || 0
-                ),
-            0
-        );
 
 
     const outstanding =
@@ -1298,94 +839,75 @@ function updateStats() {
             (sum, job) =>
                 sum +
                 Math.max(
-                    Number(job.budget) || 0 -
-                    Number(job.paid) || 0,
-                    0
+                    0,
+                    Number(job.budget || 0) -
+                    Number(job.paid || 0)
                 ),
             0
         );
 
 
-    if (totalJobs) {
-        totalJobs.textContent = total;
-    }
-
-    if (completedJobs) {
-        completedJobs.textContent =
-            completed;
-    }
-
-    if (totalPaid) {
-        totalPaid.textContent =
-            formatMoney(paid);
-    }
-
-    if (outstandingAmount) {
-        outstandingAmount.textContent =
-            formatMoney(
-                outstanding
-            );
-    }
+    const totalPaid =
+        jobs.reduce(
+            (sum, job) =>
+                sum +
+                Number(job.paid || 0),
+            0
+        );
 
 
-    if (totalProjectValue) {
+    if ($("#totalJobs")) {
 
-        totalProjectValue.textContent =
-            formatMoney(
-                jobs.reduce(
-                    (sum, job) =>
-                        sum +
-                        (
-                            Number(
-                                job.budget
-                            ) || 0
-                        ),
-                    0
-                )
-            );
+        $("#totalJobs").textContent =
+            totalJobs;
 
     }
 
 
-    if (paymentTotalPaid) {
+    if ($("#completedJobs")) {
 
-        paymentTotalPaid.textContent =
-            formatMoney(paid);
+        $("#completedJobs").textContent =
+            completedJobs;
 
     }
 
 
-    if (paymentOutstanding) {
+    if ($("#outstandingAmount")) {
 
-        paymentOutstanding.textContent =
-            formatMoney(
-                outstanding
-            );
+        $("#outstandingAmount").textContent =
+            formatMoney(outstanding);
+
+    }
+
+
+    if ($("#totalPaid")) {
+
+        $("#totalPaid").textContent =
+            formatMoney(totalPaid);
 
     }
 
 }
 
 
+/* =========================================================
+   PROJECT FILTER
+========================================================= */
+
 function filterJobs() {
 
-    if (!jobSearch) {
-        return;
-    }
-
-
     const search =
-        jobSearch.value
-            .trim()
-            .toLowerCase();
+        ($("#jobSearch")?.value || "")
+            .toLowerCase()
+            .trim();
 
 
     const status =
-        statusFilter.value;
+        $("#statusFilter")?.value || "all";
 
 
     const payment =
-        paymentFilter.value;
+        $("#paymentFilter")?.value || "all";
 
 
     const filtered =
@@ -1393,13 +915,13 @@ function filterJobs() {
 
             const matchesSearch =
 
-                String(job.name)
+                !search ||
+
+                job.name
                     .toLowerCase()
-                    .includes(search)
+                    .includes(search) ||
 
-                ||
-
-                String(job.client)
+                job.client
                     .toLowerCase()
                     .includes(search);
 
@@ -1408,51 +930,18 @@ function filterJobs() {
 
                 status === "all" ||
 
-                String(job.status)
-                    .toLowerCase() ===
-                status;
+                job.status === status;
 
 
-            let matchesPayment =
-                true;
+            const paymentStatus =
+                getPaymentStatus(job);
 
 
-            if (payment !== "all") {
+            const matchesPayment =
 
-                const paymentStatus =
-                    getPaymentStatus(
-                        Number(job.budget) || 0,
-                        Number(job.paid) || 0
-                    );
+                payment === "all" ||
 
-
-                if (payment === "paid") {
-
-                    matchesPayment =
-                        paymentStatus ===
-                        "Fully Paid";
-
-                }
-
-
-                if (payment === "partial") {
-
-                    matchesPayment =
-                        paymentStatus ===
-                        "Partially Paid";
-
-                }
-
-
-                if (payment === "pending") {
-
-                    matchesPayment =
-                        paymentStatus ===
-                        "Payment Pending";
-
-                }
-
-            }
+                paymentStatus.class === payment;
 
 
             return (
@@ -1469,164 +958,150 @@ function filterJobs() {
 }
 
 
+/* =========================================================
+   ADD PROJECT
+========================================================= */
+
 function openAddModal() {
 
-    jobForm.reset();
+    const form = $("#jobForm");
 
-    jobId.value = "";
+    if (form) {
 
-    jobModalTitle.textContent =
-        "Add New Job";
+        form.reset();
 
-    jobPaid.value = "0";
+    }
 
-    jobProgress.value = "0";
 
-    progressValue.textContent =
-        "0%";
+    if ($("#jobId")) {
+
+        $("#jobId").value = "";
+
+    }
+
+
+    if ($("#jobModalTitle")) {
+
+        $("#jobModalTitle").textContent =
+            "Add Project";
+
+    }
+
+
+    if ($("#progressValue")) {
+
+        $("#progressValue").textContent =
+            "0%";
+
+    }
+
 
     updatePaymentPreview();
 
-    openModal(jobModal);
+
+    openModal("jobModal");
 
 }
 
+
+/* =========================================================
+   EDIT PROJECT
+========================================================= */
 
 function editJob(id) {
 
     const job =
         jobs.find(
-            item =>
-                Number(item.id) ===
-                Number(id)
+            item => item.id === id
         );
 
 
-    if (!job) {
-        return;
+    if (!job) return;
+
+
+    $("#jobId").value =
+        job.id;
+
+
+    $("#jobName").value =
+        job.name;
+
+
+    $("#jobClient").value =
+        job.client;
+
+
+    $("#jobBudget").value =
+        job.budget;
+
+
+    $("#jobPaid").value =
+        job.paid;
+
+
+    $("#jobDeadline").value =
+        job.deadline;
+
+
+    $("#jobStatus").value =
+        job.status;
+
+
+    $("#jobProgress").value =
+        job.progress;
+
+
+    if ($("#progressValue")) {
+
+        $("#progressValue").textContent =
+            `${job.progress}%`;
+
     }
 
 
-    jobModalTitle.textContent =
-        "Edit Job";
+    if ($("#jobModalTitle")) {
 
+        $("#jobModalTitle").textContent =
+            "Edit Project";
 
-    jobId.value =
-        job.id;
+    }
 
-    jobName.value =
-        job.name || "";
-
-    jobClient.value =
-        job.client || "";
-
-    jobBudget.value =
-        job.budget ?? 0;
-
-    jobPaid.value =
-        job.paid ?? 0;
-
-    jobDeadline.value =
-        job.deadline || "";
-
-    jobStatus.value =
-        job.status || "active";
-
-    jobProgress.value =
-        job.progress ?? 0;
-
-    progressValue.textContent =
-        `${job.progress ?? 0}%`;
 
     updatePaymentPreview();
 
-    openModal(jobModal);
+
+    openModal("jobModal");
 
 }
 
+
+/* =========================================================
+   DELETE PROJECT
+========================================================= */
 
 function deleteJob(id) {
 
     const job =
         jobs.find(
-            item =>
-                Number(item.id) ===
-                Number(id)
+            item => item.id === id
         );
 
 
-    if (!job) {
-        return;
-    }
+    if (!job) return;
 
 
-    const attachedTasks =
-        tasks.filter(
-            task =>
-                Number(task.projectId) ===
-                Number(id)
+    const confirmed =
+        confirm(
+            `Delete "${job.name}"?`
         );
 
 
-    if (attachedTasks.length) {
-
-        const confirmed =
-            window.confirm(
-                `"${job.name}" has ${attachedTasks.length} attached task${
-                    attachedTasks.length === 1
-                        ? ""
-                        : "s"
-                }.\n\nDelete the project and leave those tasks without a project?`
-            );
-
-
-        if (!confirmed) {
-            return;
-        }
-
-
-        tasks =
-            tasks.map(task => {
-
-                if (
-                    Number(task.projectId) ===
-                    Number(id)
-                ) {
-
-                    return {
-                        ...task,
-                        projectId: ""
-                    };
-
-                }
-
-                return task;
-
-            });
-
-
-        saveTasks();
-
-    } else {
-
-        const confirmed =
-            window.confirm(
-                `Delete "${job.name}"?`
-            );
-
-
-        if (!confirmed) {
-            return;
-        }
-
-    }
+    if (!confirmed) return;
 
 
     jobs =
         jobs.filter(
-            item =>
-                Number(item.id) !==
-                Number(id)
+            item => item.id !== id
         );
 
 
@@ -1641,155 +1116,101 @@ function deleteJob(id) {
    JOB FORM
 ========================================================= */
 
-jobForm.addEventListener(
-    "submit",
-    event => {
+const jobForm = $("#jobForm");
 
-        event.preventDefault();
+if (jobForm) {
 
+    jobForm.addEventListener(
+        "submit",
+        event => {
 
-        const name =
-            jobName.value.trim();
-
-        const client =
-            jobClient.value.trim();
-
-        if (!name || !client) {
-            return;
-        }
+            event.preventDefault();
 
 
-        const budget =
-            Math.max(
-                Number(
-                    jobBudget.value
-                ) || 0,
-                0
-            );
+            const id =
+                Number($("#jobId")?.value);
 
 
-        const paid =
-            Math.min(
-                Math.max(
-                    Number(
-                        jobPaid.value
-                    ) || 0,
-                    0
-                ),
-                budget
-            );
+            const jobData = {
 
+                name:
+                    $("#jobName").value.trim(),
 
-        const deadline =
-            jobDeadline.value;
+                client:
+                    $("#jobClient").value.trim(),
 
+                budget:
+                    Number($("#jobBudget").value) || 0,
 
-        const status =
-            jobStatus.value;
+                paid:
+                    Number($("#jobPaid").value) || 0,
 
+                deadline:
+                    $("#jobDeadline").value,
 
-        let progress =
-            Number(
-                jobProgress.value
-            ) || 0;
+                status:
+                    $("#jobStatus").value,
 
-
-        if (
-            status ===
-            "completed"
-        ) {
-
-            progress = 100;
-
-        }
-
-
-        progress =
-            Math.min(
-                Math.max(
-                    progress,
-                    0
-                ),
-                100
-            );
-
-
-        const existingId =
-            jobId.value;
-
-
-        if (existingId) {
-
-            const index =
-                jobs.findIndex(
-                    item =>
-                        Number(item.id) ===
-                        Number(existingId)
-                );
-
-
-            if (index !== -1) {
-
-                jobs[index] = {
-
-                    ...jobs[index],
-
-                    name,
-
-                    client,
-
-                    budget,
-
-                    paid,
-
-                    deadline,
-
-                    status,
-
-                    progress
-
-                };
-
-            }
-
-        } else {
-
-            jobs.push({
-
-                id: Date.now(),
-
-                name,
-
-                client,
-
-                budget,
-
-                paid,
-
-                deadline,
-
-                status,
-
-                progress,
+                progress:
+                    Number($("#jobProgress").value) || 0,
 
                 icon:
                     getRandomIcon()
 
-            });
+            };
+
+
+            if (!jobData.name) {
+
+                alert("Please enter a project name.");
+
+                return;
+
+            }
+
+
+            if (id) {
+
+                const index =
+                    jobs.findIndex(
+                        job => job.id === id
+                    );
+
+
+                if (index !== -1) {
+
+                    jobData.id =
+                        id;
+
+                    jobData.icon =
+                        jobs[index].icon ||
+                        getRandomIcon();
+
+                    jobs[index] =
+                        jobData;
+
+                }
+
+            } else {
+
+                jobData.id =
+                    Date.now();
+
+                jobs.push(jobData);
+
+            }
+
+
+            saveJobs();
+
+            closeModal("jobModal");
+
+            renderAll();
 
         }
+    );
 
-
-        saveJobs();
-
-        closeModal(jobModal);
-
-        renderAll();
-
-        showSection("projects");
-
-    }
-);
+}
 
 
 /* =========================================================
@@ -1799,87 +1220,64 @@ jobForm.addEventListener(
 function updatePaymentPreview() {
 
     const budget =
-        Number(
-            jobBudget.value
-        ) || 0;
-
+        Number($("#jobBudget")?.value) || 0;
 
     const paid =
-        Math.min(
-            Number(
-                jobPaid.value
-            ) || 0,
-            budget
-        );
+        Number($("#jobPaid")?.value) || 0;
 
 
     const remaining =
         Math.max(
-            budget - paid,
-            0
+            0,
+            budget - paid
         );
 
 
-    if (previewPaymentStatus) {
+    const status =
+        getPaymentStatus({
+            budget,
+            paid
+        });
 
-        previewPaymentStatus.textContent =
-            getPaymentStatus(
-                budget,
-                paid
-            );
+
+    if ($("#previewPaymentStatus")) {
+
+        $("#previewPaymentStatus").textContent =
+            status.label;
 
     }
 
 
-    if (previewRemaining) {
+    if ($("#previewRemaining")) {
 
-        previewRemaining.textContent =
-            formatMoney(
-                remaining
-            );
+        $("#previewRemaining").textContent =
+            formatMoney(remaining);
 
     }
 
 }
 
 
-jobBudget.addEventListener(
+$("#jobBudget")?.addEventListener(
     "input",
     updatePaymentPreview
 );
 
 
-jobPaid.addEventListener(
+$("#jobPaid")?.addEventListener(
     "input",
     updatePaymentPreview
 );
 
 
-jobProgress.addEventListener(
+$("#jobProgress")?.addEventListener(
     "input",
-    () => {
+    event => {
 
-        progressValue.textContent =
-            `${jobProgress.value}%`;
+        if ($("#progressValue")) {
 
-    }
-);
-
-
-jobStatus.addEventListener(
-    "change",
-    () => {
-
-        if (
-            jobStatus.value ===
-            "completed"
-        ) {
-
-            jobProgress.value =
-                100;
-
-            progressValue.textContent =
-                "100%";
+            $("#progressValue").textContent =
+                `${event.target.value}%`;
 
         }
 
@@ -1891,43 +1289,46 @@ jobStatus.addEventListener(
    CLIENTS
 ========================================================= */
 
-function displayClients(clientList) {
+function displayClients(clientList = clients) {
 
-    clientsGrid.innerHTML = "";
+    const grid =
+        $("#clientsGrid");
+
+
+    const empty =
+        $("#emptyClients");
+
+
+    if (!grid) return;
+
+
+    grid.innerHTML = "";
 
 
     if (!clientList.length) {
 
-        emptyClients.classList.remove(
-            "hidden"
-        );
+        if (empty) {
+
+            empty.style.display = "";
+
+        }
 
         return;
 
     }
 
 
-    emptyClients.classList.add(
-        "hidden"
-    );
+    if (empty) {
+
+        empty.style.display = "none";
+
+    }
 
 
     clientList.forEach(client => {
 
-        const clientJobs =
-            jobs.filter(
-                job =>
-                    String(job.client)
-                        .toLowerCase() ===
-                    String(client.name)
-                        .toLowerCase()
-            );
-
-
         const card =
-            document.createElement(
-                "article"
-            );
+            document.createElement("div");
 
 
         card.className =
@@ -1936,158 +1337,81 @@ function displayClients(clientList) {
 
         card.innerHTML = `
 
-            <div class="client-card-top">
+            <div class="client-card-header">
 
-                <div class="client-card-main">
+                <div class="client-avatar">
 
-                    <div class="client-avatar">
-
-                        ${getInitials(
-                            client.name
-                        )}
-
-                    </div>
-
-                    <div>
-
-                        <h3>
-                            ${escapeHTML(
-                                client.name
-                            )}
-                        </h3>
-
-                        <div class="client-company">
-
-                            ${escapeHTML(
-                                client.company ||
-                                "Independent Client"
-                            )}
-
-                        </div>
-
-                    </div>
+                    ${getInitials(client.name)}
 
                 </div>
 
+                <div class="client-actions">
 
-                <span class="status status-${safeStatus(
-                    client.status ||
-                    "active"
-                )}">
+                    <button
+                        class="icon-btn edit-client"
+                        data-id="${client.id}"
+                    >
+                        <i class="bi bi-pencil"></i>
+                    </button>
 
-                    ${capitalize(
-                        client.status ||
-                        "active"
-                    )}
+                    <button
+                        class="icon-btn delete-client"
+                        data-id="${client.id}"
+                    >
+                        <i class="bi bi-trash"></i>
+                    </button>
 
-                </span>
-
-            </div>
-
-
-            <div class="client-contact">
-
-                ${
-                    client.email
-                        ? `
-                            <div>
-
-                                <i class="bi bi-envelope"></i>
-
-                                <span>
-                                    ${escapeHTML(
-                                        client.email
-                                    )}
-                                </span>
-
-                            </div>
-                        `
-                        : ""
-                }
-
-
-                ${
-                    client.phone
-                        ? `
-                            <div>
-
-                                <i class="bi bi-telephone"></i>
-
-                                <span>
-                                    ${escapeHTML(
-                                        client.phone
-                                    )}
-                                </span>
-
-                            </div>
-                        `
-                        : ""
-                }
+                </div>
 
             </div>
 
 
-            <p class="client-notes">
+            <h3>
+                ${escapeHTML(client.name)}
+            </h3>
 
-                ${
-                    client.notes
-                        ? escapeHTML(
-                            client.notes
-                        )
-                        : "No notes added."
-                }
 
+            <p>
+                ${escapeHTML(client.company || "")}
             </p>
 
 
-            <div class="client-card-footer">
+            <div class="client-info">
 
-                <span class="client-company">
+                <span>
 
-                    ${clientJobs.length}
+                    <i class="bi bi-envelope"></i>
 
-                    ${
-                        clientJobs.length === 1
-                            ? " project"
-                            : " projects"
-                    }
+                    ${escapeHTML(client.email || "-")}
 
                 </span>
 
 
-                <div class="card-actions">
+                <span>
 
-                    <button
-                        type="button"
-                        class="card-btn edit-client"
-                        data-id="${client.id}"
-                        title="Edit client"
-                    >
+                    <i class="bi bi-telephone"></i>
 
-                        <i class="bi bi-pencil"></i>
+                    ${escapeHTML(client.phone || "-")}
 
-                    </button>
+                </span>
+
+            </div>
 
 
-                    <button
-                        type="button"
-                        class="card-btn delete delete-client"
-                        data-id="${client.id}"
-                        title="Delete client"
-                    >
+            <div class="client-footer">
 
-                        <i class="bi bi-trash"></i>
+                <span class="status-badge ${safeStatus(client.status)}">
 
-                    </button>
+                    ${capitalize(client.status)}
 
-                </div>
+                </span>
 
             </div>
 
         `;
 
 
-        clientsGrid.appendChild(card);
+        grid.appendChild(card);
 
     });
 
@@ -2097,100 +1421,106 @@ function displayClients(clientList) {
 }
 
 
+/* =========================================================
+   CLIENT ACTIONS
+========================================================= */
+
 function attachClientActions() {
 
-    document
-        .querySelectorAll(
-            ".edit-client"
-        )
-        .forEach(button => {
+    $$(".edit-client").forEach(button => {
 
-            button.addEventListener(
-                "click",
-                () => {
+        button.addEventListener(
+            "click",
+            () => {
 
-                    editClient(
-                        Number(
-                            button.dataset.id
-                        )
-                    );
+                editClient(
+                    Number(button.dataset.id)
+                );
 
-                }
-            );
+            }
+        );
 
-        });
+    });
 
 
-    document
-        .querySelectorAll(
-            ".delete-client"
-        )
-        .forEach(button => {
+    $$(".delete-client").forEach(button => {
 
-            button.addEventListener(
-                "click",
-                () => {
+        button.addEventListener(
+            "click",
+            () => {
 
-                    deleteClient(
-                        Number(
-                            button.dataset.id
-                        )
-                    );
+                deleteClient(
+                    Number(button.dataset.id)
+                );
 
-                }
-            );
+            }
+        );
 
-        });
+    });
 
 }
 
+
+/* =========================================================
+   CLIENT STATS
+========================================================= */
 
 function updateClientStats() {
 
-    if (totalClients) {
+    const total =
+        clients.length;
 
-        totalClients.textContent =
-            clients.length;
+
+    const active =
+        clients.filter(
+            client =>
+                client.status === "active"
+        ).length;
+
+
+    const completed =
+        clients.filter(
+            client =>
+                client.status === "completed"
+        ).length;
+
+
+    if ($("#totalClients")) {
+
+        $("#totalClients").textContent =
+            total;
 
     }
 
 
-    if (activeClients) {
+    if ($("#activeClients")) {
 
-        activeClients.textContent =
-            clients.filter(
-                client =>
-                    String(
-                        client.status
-                    ).toLowerCase() ===
-                    "active"
-            ).length;
+        $("#activeClients").textContent =
+            active;
 
     }
 
 
-    if (completedClients) {
+    if ($("#completedClients")) {
 
-        completedClients.textContent =
-            clients.filter(
-                client =>
-                    String(
-                        client.status
-                    ).toLowerCase() ===
-                    "completed"
-            ).length;
+        $("#completedClients").textContent =
+            completed;
 
     }
 
 }
 
+
+/* =========================================================
+   CLIENT FILTER
+========================================================= */
 
 function filterClients() {
 
     const search =
-        clientSearch.value
-            .trim()
-            .toLowerCase();
+        ($("#clientSearch")?.value || "")
+            .toLowerCase()
+            .trim();
 
 
     const filtered =
@@ -2198,25 +1528,17 @@ function filterClients() {
 
             return (
 
-                String(
-                    client.name
-                )
+                !search ||
+
+                client.name
                     .toLowerCase()
-                    .includes(search)
+                    .includes(search) ||
 
-                ||
-
-                String(
-                    client.email
-                )
+                (client.company || "")
                     .toLowerCase()
-                    .includes(search)
+                    .includes(search) ||
 
-                ||
-
-                String(
-                    client.company
-                )
+                (client.email || "")
                     .toLowerCase()
                     .includes(search)
 
@@ -2230,121 +1552,116 @@ function filterClients() {
 }
 
 
+/* =========================================================
+   OPEN CLIENT MODAL
+========================================================= */
+
 function openClientModal() {
 
-    clientForm.reset();
+    $("#clientForm")?.reset();
 
-    clientId.value = "";
 
-    clientModalTitle.textContent =
-        "Add New Client";
+    if ($("#clientId")) {
 
-    openModal(clientModal);
+        $("#clientId").value = "";
+
+    }
+
+
+    if ($("#clientModalTitle")) {
+
+        $("#clientModalTitle").textContent =
+            "Add Client";
+
+    }
+
+
+    openModal("clientModal");
 
 }
 
+
+/* =========================================================
+   EDIT CLIENT
+========================================================= */
 
 function editClient(id) {
 
     const client =
         clients.find(
-            item =>
-                Number(item.id) ===
-                Number(id)
+            item => item.id === id
         );
 
 
-    if (!client) {
-        return;
-    }
+    if (!client) return;
 
 
-    clientModalTitle.textContent =
-        "Edit Client";
-
-
-    clientId.value =
+    $("#clientId").value =
         client.id;
 
-    clientName.value =
+
+    $("#clientName").value =
         client.name || "";
 
-    clientEmail.value =
+
+    $("#clientEmail").value =
         client.email || "";
 
-    clientPhone.value =
+
+    $("#clientPhone").value =
         client.phone || "";
 
-    clientCompany.value =
+
+    $("#clientCompany").value =
         client.company || "";
 
-    clientNotes.value =
+
+    $("#clientNotes").value =
         client.notes || "";
 
 
-    openModal(clientModal);
+    if ($("#clientModalTitle")) {
+
+        $("#clientModalTitle").textContent =
+            "Edit Client";
+
+    }
+
+
+    openModal("clientModal");
 
 }
 
+
+/* =========================================================
+   DELETE CLIENT
+========================================================= */
 
 function deleteClient(id) {
 
     const client =
         clients.find(
-            item =>
-                Number(item.id) ===
-                Number(id)
+            item => item.id === id
         );
 
 
-    if (!client) {
-        return;
-    }
+    if (!client) return;
 
 
-    const attachedJobs =
-        jobs.filter(
-            job =>
-                String(
-                    job.client
-                ).toLowerCase() ===
-                String(
-                    client.name
-                ).toLowerCase()
-        );
-
-
-    if (attachedJobs.length) {
-
-        alert(
-            `You cannot delete ${client.name} because ${attachedJobs.length} project${
-                attachedJobs.length === 1
-                    ? ""
-                    : "s"
-            } is attached to this client.`
-        );
+    if (
+        !confirm(
+            `Delete "${client.name}"?`
+        )
+    ) {
 
         return;
 
-    }
-
-
-    const confirmed =
-        window.confirm(
-            `Delete client "${client.name}"?`
-        );
-
-
-    if (!confirmed) {
-        return;
     }
 
 
     clients =
         clients.filter(
-            item =>
-                Number(item.id) !==
-                Number(id)
+            item => item.id !== id
         );
 
 
@@ -2355,240 +1672,235 @@ function deleteClient(id) {
 }
 
 
-clientForm.addEventListener(
-    "submit",
-    event => {
+/* =========================================================
+   CLIENT FORM
+========================================================= */
 
-        event.preventDefault();
-
-
-        const name =
-            clientName.value.trim();
+const clientForm =
+    $("#clientForm");
 
 
-        if (!name) {
-            return;
-        }
+if (clientForm) {
+
+    clientForm.addEventListener(
+        "submit",
+        event => {
+
+            event.preventDefault();
 
 
-        const existingId =
-            clientId.value;
+            const id =
+                Number($("#clientId")?.value);
 
 
-        if (existingId) {
+            const clientData = {
 
-            const index =
-                clients.findIndex(
-                    item =>
-                        Number(item.id) ===
-                        Number(existingId)
-                );
-
-
-            if (index !== -1) {
-
-                const oldName =
-                    clients[index].name;
-
-
-                clients[index] = {
-
-                    ...clients[index],
-
-                    name,
-
-                    email:
-                        clientEmail.value.trim(),
-
-                    phone:
-                        clientPhone.value.trim(),
-
-                    company:
-                        clientCompany.value.trim(),
-
-                    notes:
-                        clientNotes.value.trim()
-
-                };
-
-
-                jobs =
-                    jobs.map(job => {
-
-                        if (
-                            String(
-                                job.client
-                            ).toLowerCase() ===
-                            String(
-                                oldName
-                            ).toLowerCase()
-                        ) {
-
-                            return {
-
-                                ...job,
-
-                                client: name
-
-                            };
-
-                        }
-
-                        return job;
-
-                    });
-
-
-                saveJobs();
-
-            }
-
-        } else {
-
-            clients.push({
-
-                id: Date.now(),
-
-                name,
+                name:
+                    $("#clientName").value.trim(),
 
                 email:
-                    clientEmail.value.trim(),
+                    $("#clientEmail").value.trim(),
 
                 phone:
-                    clientPhone.value.trim(),
+                    $("#clientPhone").value.trim(),
 
                 company:
-                    clientCompany.value.trim(),
+                    $("#clientCompany").value.trim(),
 
                 notes:
-                    clientNotes.value.trim(),
+                    $("#clientNotes").value.trim(),
 
                 status:
                     "active"
 
-            });
+            };
+
+
+            if (!clientData.name) {
+
+                alert(
+                    "Please enter the client name."
+                );
+
+                return;
+
+            }
+
+
+            if (id) {
+
+                const index =
+                    clients.findIndex(
+                        client =>
+                            client.id === id
+                    );
+
+
+                if (index !== -1) {
+
+                    const oldName =
+                        clients[index].name;
+
+
+                    clientData.id =
+                        id;
+
+
+                    clientData.status =
+                        clients[index].status;
+
+
+                    clients[index] =
+                        clientData;
+
+
+                    /*
+                       Update projects using old client name.
+                    */
+
+                    jobs.forEach(job => {
+
+                        if (
+                            job.client === oldName
+                        ) {
+
+                            job.client =
+                                clientData.name;
+
+                        }
+
+                    });
+
+
+                    saveJobs();
+
+                }
+
+            } else {
+
+                clientData.id =
+                    Date.now();
+
+                clients.push(clientData);
+
+            }
+
+
+            saveClients();
+
+            closeModal("clientModal");
+
+            renderAll();
 
         }
+    );
 
-
-        saveClients();
-
-        closeModal(clientModal);
-
-        renderAll();
-
-        showSection("clients");
-
-    }
-);
+}
 
 
 /* =========================================================
-   TEAM
+   TEAM MEMBERS
 ========================================================= */
 
 function updateTeamStats() {
 
+    const total =
+        teamMembers.length;
+
+
     const active =
         teamMembers.filter(
             member =>
-                String(
-                    member.status
-                ).toLowerCase() ===
-                "active"
+                member.status === "active"
         ).length;
 
 
-    const assigned =
+    const assignedTasks =
         tasks.filter(
             task =>
-                task.assigneeId !==
-                "" &&
-                task.assigneeId !==
-                null &&
-                task.assigneeId !==
-                undefined
+                task.status !== "completed"
         ).length;
 
 
-    const completed =
+    const completedTasks =
         tasks.filter(
             task =>
-                String(
-                    task.status
-                ).toLowerCase() ===
-                "completed"
+                task.status === "completed"
         ).length;
 
 
-    if (totalTeamMembers) {
+    if ($("#totalTeamMembers")) {
 
-        totalTeamMembers.textContent =
-            teamMembers.length;
+        $("#totalTeamMembers").textContent =
+            total;
 
     }
 
 
-    if (activeTeamMembers) {
+    if ($("#activeTeamMembers")) {
 
-        activeTeamMembers.textContent =
+        $("#activeTeamMembers").textContent =
             active;
 
     }
 
 
-    if (assignedTeamTasks) {
+    if ($("#assignedTeamTasks")) {
 
-        assignedTeamTasks.textContent =
-            assigned;
-
-    }
-
-
-    if (teamCompletedTasks) {
-
-        teamCompletedTasks.textContent =
-            completed;
+        $("#assignedTeamTasks").textContent =
+            assignedTasks;
 
     }
 
 
-    if (dashboardTeamCount) {
+    if ($("#teamCompletedTasks")) {
 
-        dashboardTeamCount.textContent =
-            teamMembers.length;
+        $("#teamCompletedTasks").textContent =
+            completedTasks;
 
     }
 
 }
 
 
-function displayTeamMembers(
-    memberList
-) {
+/* =========================================================
+   DISPLAY TEAM
+========================================================= */
 
-    if (!teamGrid) {
-        return;
-    }
+function displayTeamMembers(memberList = teamMembers) {
+
+    const grid =
+        $("#teamGrid");
 
 
-    teamGrid.innerHTML = "";
+    const empty =
+        $("#emptyTeam");
+
+
+    if (!grid) return;
+
+
+    grid.innerHTML = "";
 
 
     if (!memberList.length) {
 
-        emptyTeam.classList.remove(
-            "hidden"
-        );
+        if (empty) {
+
+            empty.style.display = "";
+
+        }
 
         return;
 
     }
 
 
-    emptyTeam.classList.add(
-        "hidden"
-    );
+    if (empty) {
+
+        empty.style.display = "none";
+
+    }
 
 
     memberList.forEach(member => {
@@ -2596,36 +1908,20 @@ function displayTeamMembers(
         const memberTasks =
             tasks.filter(
                 task =>
-                    Number(
-                        task.assigneeId
-                    ) ===
-                    Number(
-                        member.id
-                    )
+                    Number(task.assignee) ===
+                    Number(member.id)
             );
 
 
         const completed =
             memberTasks.filter(
                 task =>
-                    String(
-                        task.status
-                    ).toLowerCase() ===
-                    "completed"
+                    task.status === "completed"
             ).length;
 
 
-        const status =
-            String(
-                member.status ||
-                "active"
-            ).toLowerCase();
-
-
         const card =
-            document.createElement(
-                "article"
-            );
+            document.createElement("div");
 
 
         card.className =
@@ -2636,165 +1932,93 @@ function displayTeamMembers(
 
             <div class="team-card-header">
 
-                <div class="team-member-info">
+                <div class="team-avatar">
 
-                    <div class="team-avatar">
-
-                        ${getInitials(
-                            member.name
-                        )}
-
-                    </div>
-
-
-                    <div>
-
-                        <h3>
-                            ${escapeHTML(
-                                member.name
-                            )}
-                        </h3>
-
-                        <span>
-
-                            ${escapeHTML(
-                                member.email ||
-                                "No email"
-                            )}
-
-                        </span>
-
-                    </div>
+                    ${getInitials(member.name)}
 
                 </div>
 
 
-                <span class="team-role">
+                <div class="team-actions">
 
-                    ${escapeHTML(
-                        member.role ||
-                        "Team Member"
-                    )}
+                    ${
+                        canManageTeam()
+                            ? `
+                                <button
+                                    class="icon-btn edit-member"
+                                    data-id="${member.id}"
+                                >
+                                    <i class="bi bi-pencil"></i>
+                                </button>
 
-                </span>
-
-            </div>
-
-
-            <div class="team-card-body">
-
-                <div class="team-card-row">
-
-                    <span>
-                        Status
-                    </span>
-
-                    <strong
-                        class="team-status ${
-                            status ===
-                            "active"
-                                ? ""
-                                : "inactive"
-                        }"
-                    >
-
-                        ${capitalize(
-                            status
-                        )}
-
-                    </strong>
-
-                </div>
-
-
-                <div class="team-card-row">
-
-                    <span>
-                        Assigned Tasks
-                    </span>
-
-                    <strong>
-                        ${memberTasks.length}
-                    </strong>
-
-                </div>
-
-
-                <div class="team-card-row">
-
-                    <span>
-                        Completed
-                    </span>
-
-                    <strong>
-                        ${completed}
-                    </strong>
+                                <button
+                                    class="icon-btn delete-member"
+                                    data-id="${member.id}"
+                                >
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                              `
+                            : ""
+                    }
 
                 </div>
 
             </div>
 
 
-            ${
-                member.notes
-                    ? `
-                        <p class="client-notes">
-
-                            ${escapeHTML(
-                                member.notes
-                            )}
-
-                        </p>
-                    `
-                    : ""
-            }
+            <h3>
+                ${escapeHTML(member.name)}
+            </h3>
 
 
-            <div class="team-card-footer">
+            <p>
+                ${escapeHTML(member.role || "Team Member")}
+            </p>
 
-                <span class="team-card-email">
 
-                    ${escapeHTML(
-                        member.email ||
-                        "No email provided"
-                    )}
+            <div class="team-info">
+
+                <span>
+
+                    <i class="bi bi-envelope"></i>
+
+                    ${escapeHTML(member.email || "-")}
 
                 </span>
 
 
-                <div class="team-card-actions">
+                <span>
 
-                    <button
-                        type="button"
-                        class="card-btn edit-member"
-                        data-id="${member.id}"
-                        title="Edit member"
-                    >
+                    <i class="bi bi-list-task"></i>
 
-                        <i class="bi bi-pencil"></i>
+                    ${memberTasks.length} tasks
 
-                    </button>
+                </span>
+
+            </div>
 
 
-                    <button
-                        type="button"
-                        class="card-btn delete delete-member"
-                        data-id="${member.id}"
-                        title="Delete member"
-                    >
+            <div class="team-footer">
 
-                        <i class="bi bi-trash"></i>
+                <span class="status-badge ${safeStatus(member.status)}">
 
-                    </button>
+                    ${capitalize(member.status)}
 
-                </div>
+                </span>
+
+
+                <span>
+
+                    ${completed} completed
+
+                </span>
 
             </div>
 
         `;
 
 
-        teamGrid.appendChild(card);
+        grid.appendChild(card);
 
     });
 
@@ -2804,428 +2028,428 @@ function displayTeamMembers(
 }
 
 
+/* =========================================================
+   TEAM ACTIONS
+========================================================= */
+
 function attachTeamActions() {
 
-    document
-        .querySelectorAll(
-            ".edit-member"
-        )
-        .forEach(button => {
+    $$(".edit-member").forEach(button => {
 
-            button.addEventListener(
-                "click",
-                () => {
+        button.addEventListener(
+            "click",
+            () => {
 
-                    editTeamMember(
-                        Number(
-                            button.dataset.id
-                        )
-                    );
-
-                }
-            );
-
-        });
-
-
-    document
-        .querySelectorAll(
-            ".delete-member"
-        )
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    deleteTeamMember(
-                        Number(
-                            button.dataset.id
-                        )
-                    );
-
-                }
-            );
-
-        });
-
-}
-
-
-function filterTeamMembers() {
-
-    const search =
-        teamSearch.value
-            .trim()
-            .toLowerCase();
-
-
-    const filtered =
-        teamMembers.filter(
-            member => {
-
-                return (
-
-                    String(
-                        member.name
-                    )
-                        .toLowerCase()
-                        .includes(search)
-
-                    ||
-
-                    String(
-                        member.role
-                    )
-                        .toLowerCase()
-                        .includes(search)
-
-                    ||
-
-                    String(
-                        member.email
-                    )
-                        .toLowerCase()
-                        .includes(search)
-
+                editTeamMember(
+                    Number(button.dataset.id)
                 );
 
             }
         );
 
+    });
 
-    displayTeamMembers(
-        filtered
-    );
 
-    updateTeamStats();
+    $$(".delete-member").forEach(button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                deleteTeamMember(
+                    Number(button.dataset.id)
+                );
+
+            }
+        );
+
+    });
 
 }
 
+
+/* =========================================================
+   TEAM FILTER
+========================================================= */
+
+function filterTeamMembers() {
+
+    if (!canManageTeam()) {
+
+        return;
+
+    }
+
+
+    const search =
+        ($("#teamSearch")?.value || "")
+            .toLowerCase()
+            .trim();
+
+
+    const filtered =
+        teamMembers.filter(member => {
+
+            return (
+
+                !search ||
+
+                member.name
+                    .toLowerCase()
+                    .includes(search) ||
+
+                (member.role || "")
+                    .toLowerCase()
+                    .includes(search) ||
+
+                (member.email || "")
+                    .toLowerCase()
+                    .includes(search)
+
+            );
+
+        });
+
+
+    displayTeamMembers(filtered);
+
+}
+
+
+/* =========================================================
+   OPEN TEAM MODAL
+========================================================= */
 
 function openMemberModal() {
 
-    memberForm.reset();
+    if (!canManageTeam()) {
 
-    memberId.value = "";
+        showPermissionDenied(
+            "Team management"
+        );
 
-    memberModalTitle.textContent =
-        "Add Team Member";
+        return;
 
-    openModal(memberModal);
+    }
+
+
+    $("#memberForm")?.reset();
+
+
+    if ($("#memberId")) {
+
+        $("#memberId").value = "";
+
+    }
+
+
+    if ($("#memberModalTitle")) {
+
+        $("#memberModalTitle").textContent =
+            "Add Team Member";
+
+    }
+
+
+    openModal("memberModal");
 
 }
 
+
+/* =========================================================
+   EDIT TEAM MEMBER
+========================================================= */
 
 function editTeamMember(id) {
 
-    const member =
-        teamMembers.find(
-            item =>
-                Number(item.id) ===
-                Number(id)
+    if (!canManageTeam()) {
+
+        showPermissionDenied(
+            "Team management"
         );
 
-
-    if (!member) {
         return;
+
     }
 
 
-    memberModalTitle.textContent =
-        "Edit Team Member";
+    const member =
+        teamMembers.find(
+            item => item.id === id
+        );
 
 
-    memberId.value =
+    if (!member) return;
+
+
+    $("#memberId").value =
         member.id;
 
-    memberName.value =
+
+    $("#memberName").value =
         member.name || "";
 
-    memberRole.value =
+
+    $("#memberRole").value =
         member.role || "";
 
-    memberEmail.value =
+
+    $("#memberEmail").value =
         member.email || "";
 
-    memberStatus.value =
-        member.status ||
-        "active";
 
-    memberNotes.value =
+    $("#memberStatus").value =
+        member.status || "active";
+
+
+    $("#memberNotes").value =
         member.notes || "";
 
 
-    openModal(memberModal);
+    if ($("#memberModalTitle")) {
+
+        $("#memberModalTitle").textContent =
+            "Edit Team Member";
+
+    }
+
+
+    openModal("memberModal");
 
 }
 
 
+/* =========================================================
+   DELETE TEAM MEMBER
+========================================================= */
+
 function deleteTeamMember(id) {
 
-    const member =
-        teamMembers.find(
-            item =>
-                Number(item.id) ===
-                Number(id)
+    if (!canManageTeam()) {
+
+        showPermissionDenied(
+            "Team management"
         );
 
-
-    if (!member) {
         return;
+
     }
 
 
-    const assignedTasks =
-        tasks.filter(
-            task =>
-                Number(
-                    task.assigneeId
-                ) ===
-                Number(id)
+    const member =
+        teamMembers.find(
+            item => item.id === id
         );
 
 
-    if (assignedTasks.length) {
-
-        const confirmed =
-            window.confirm(
-                `${member.name} has ${assignedTasks.length} assigned task${
-                    assignedTasks.length === 1
-                        ? ""
-                        : "s"
-                }.\n\nDelete the member and leave those tasks unassigned?`
-            );
+    if (!member) return;
 
 
-        if (!confirmed) {
-            return;
-        }
+    if (
+        !confirm(
+            `Delete "${member.name}"?`
+        )
+    ) {
 
-
-        tasks =
-            tasks.map(task => {
-
-                if (
-                    Number(
-                        task.assigneeId
-                    ) ===
-                    Number(id)
-                ) {
-
-                    return {
-
-                        ...task,
-
-                        assigneeId: ""
-
-                    };
-
-                }
-
-                return task;
-
-            });
-
-
-        saveTasks();
-
-    } else {
-
-        const confirmed =
-            window.confirm(
-                `Delete team member "${member.name}"?`
-            );
-
-
-        if (!confirmed) {
-            return;
-        }
+        return;
 
     }
 
 
     teamMembers =
         teamMembers.filter(
-            item =>
-                Number(item.id) !==
-                Number(id)
+            item => item.id !== id
         );
 
 
-    saveTeamMembers();
+    /*
+       Remove member assignment from tasks.
+    */
+
+    tasks.forEach(task => {
+
+        if (
+            Number(task.assignee) === id
+        ) {
+
+            task.assignee = "";
+
+        }
+
+    });
+
+
+    saveTeam();
+
+    saveTasks();
 
     renderAll();
 
 }
 
 
-memberForm.addEventListener(
-    "submit",
-    event => {
+/* =========================================================
+   TEAM FORM
+========================================================= */
 
-        event.preventDefault();
-
-
-        const name =
-            memberName.value.trim();
+const memberForm =
+    $("#memberForm");
 
 
-        if (!name) {
-            return;
-        }
+if (memberForm) {
+
+    memberForm.addEventListener(
+        "submit",
+        event => {
+
+            event.preventDefault();
 
 
-        const existingId =
-            memberId.value;
+            if (!canManageTeam()) {
 
-
-        const data = {
-
-            name,
-
-            role:
-                memberRole.value.trim(),
-
-            email:
-                memberEmail.value.trim(),
-
-            status:
-                memberStatus.value ||
-                "active",
-
-            notes:
-                memberNotes.value.trim()
-
-        };
-
-
-        if (existingId) {
-
-            const index =
-                teamMembers.findIndex(
-                    member =>
-                        Number(
-                            member.id
-                        ) ===
-                        Number(
-                            existingId
-                        )
+                showPermissionDenied(
+                    "Team management"
                 );
 
-
-            if (index !== -1) {
-
-                teamMembers[index] = {
-
-                    ...teamMembers[index],
-
-                    ...data
-
-                };
+                return;
 
             }
 
-        } else {
 
-            teamMembers.push({
+            const id =
+                Number($("#memberId")?.value);
 
-                id: Date.now(),
 
-                ...data
+            const memberData = {
 
-            });
+                name:
+                    $("#memberName").value.trim(),
+
+                role:
+                    $("#memberRole").value.trim(),
+
+                email:
+                    $("#memberEmail").value.trim(),
+
+                status:
+                    $("#memberStatus").value,
+
+                notes:
+                    $("#memberNotes").value.trim()
+
+            };
+
+
+            if (!memberData.name) {
+
+                alert(
+                    "Please enter the member name."
+                );
+
+                return;
+
+            }
+
+
+            if (id) {
+
+                const index =
+                    teamMembers.findIndex(
+                        member =>
+                            member.id === id
+                    );
+
+
+                if (index !== -1) {
+
+                    memberData.id =
+                        id;
+
+                    teamMembers[index] =
+                        memberData;
+
+                }
+
+            } else {
+
+                memberData.id =
+                    Date.now();
+
+                teamMembers.push(
+                    memberData
+                );
+
+            }
+
+
+            saveTeam();
+
+            closeModal("memberModal");
+
+            renderAll();
 
         }
+    );
 
-
-        saveTeamMembers();
-
-        closeModal(memberModal);
-
-        renderAll();
-
-        showSection("team");
-
-    }
-);
+}
 
 
 /* =========================================================
    TASK HELPERS
 ========================================================= */
 
-function getTaskStatusLabel(
-    status
-) {
+function getTaskStatusLabel(status) {
 
     const labels = {
 
-        todo: "To Do",
-
-        progress: "In Progress",
-
-        review: "Review",
-
+        pending: "Pending",
+        in_progress: "In Progress",
         completed: "Completed"
 
     };
 
 
-    return (
-        labels[status] ||
-        capitalize(status)
-    );
+    return labels[status] ||
+        capitalize(status || "Pending");
 
 }
 
 
-function getTaskPriorityLabel(
-    priority
-) {
+function getTaskPriorityLabel(priority) {
 
     const labels = {
 
         low: "Low",
-
         medium: "Medium",
-
         high: "High",
-
         urgent: "Urgent"
 
     };
 
 
-    return (
-        labels[priority] ||
-        capitalize(priority)
-    );
+    return labels[priority] ||
+        capitalize(priority || "Medium");
 
 }
 
 
-function getTaskProject(
-    task
-) {
+function getTaskProject(task) {
 
     return jobs.find(
         job =>
             Number(job.id) ===
-            Number(task.projectId)
+            Number(task.project)
     );
 
 }
 
 
-function getTaskAssignee(
-    task
-) {
+function getTaskAssignee(task) {
 
     return teamMembers.find(
         member =>
             Number(member.id) ===
-            Number(task.assigneeId)
+            Number(task.assignee)
     );
 
 }
@@ -3235,8 +2459,7 @@ function isTaskOverdue(task) {
 
     if (
         !task.dueDate ||
-        task.status ===
-        "completed"
+        task.status === "completed"
     ) {
 
         return false;
@@ -3244,18 +2467,29 @@ function isTaskOverdue(task) {
     }
 
 
-    const due =
-        new Date(
-            `${task.dueDate}T23:59:59`
-        );
+    const today =
+        new Date();
 
-
-    return (
-        !Number.isNaN(
-            due.getTime()
-        ) &&
-        due < new Date()
+    today.setHours(
+        0,
+        0,
+        0,
+        0
     );
+
+
+    const due =
+        new Date(task.dueDate);
+
+    due.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+
+    return due < today;
 
 }
 
@@ -3270,81 +2504,54 @@ function updateTaskStats() {
         tasks.length;
 
 
-    const progress =
+    const inProgress =
         tasks.filter(
             task =>
-                task.status ===
-                "progress"
+                task.status === "in_progress"
         ).length;
 
 
     const pending =
         tasks.filter(
             task =>
-                task.status ===
-                "todo"
+                task.status === "pending"
         ).length;
 
 
     const completed =
         tasks.filter(
             task =>
-                task.status ===
-                "completed"
+                task.status === "completed"
         ).length;
 
 
-    if (totalTasks) {
+    if ($("#totalTasks")) {
 
-        totalTasks.textContent =
+        $("#totalTasks").textContent =
             total;
 
     }
 
 
-    if (inProgressTasks) {
+    if ($("#inProgressTasks")) {
 
-        inProgressTasks.textContent =
-            progress;
+        $("#inProgressTasks").textContent =
+            inProgress;
 
     }
 
 
-    if (pendingTasks) {
+    if ($("#pendingTasks")) {
 
-        pendingTasks.textContent =
+        $("#pendingTasks").textContent =
             pending;
 
     }
 
 
-    if (completedTasks) {
+    if ($("#completedTasks")) {
 
-        completedTasks.textContent =
-            completed;
-
-    }
-
-
-    if (dashboardTaskCount) {
-
-        dashboardTaskCount.textContent =
-            total;
-
-    }
-
-
-    if (dashboardActiveTasks) {
-
-        dashboardActiveTasks.textContent =
-            total - completed;
-
-    }
-
-
-    if (dashboardCompletedTasks) {
-
-        dashboardCompletedTasks.textContent =
+        $("#completedTasks").textContent =
             completed;
 
     }
@@ -3353,126 +2560,67 @@ function updateTaskStats() {
 
 
 /* =========================================================
-   TASK DISPLAY
+   DISPLAY TASKS
 ========================================================= */
 
-function displayTasks(
-    taskList
-) {
+function displayTasks(taskList = tasks) {
 
-    if (!tasksGrid) {
-        return;
-    }
+    const grid =
+        $("#tasksGrid");
 
 
-    tasksGrid.innerHTML = "";
+    const empty =
+        $("#emptyTasks");
+
+
+    if (!grid) return;
+
+
+    grid.innerHTML = "";
 
 
     if (!taskList.length) {
 
-        emptyTasks.classList.remove(
-            "hidden"
-        );
+        if (empty) {
+
+            empty.style.display = "";
+
+        }
 
         return;
 
     }
 
 
-    emptyTasks.classList.add(
-        "hidden"
-    );
+    if (empty) {
 
+        empty.style.display = "none";
 
-    /*
-     * We use the existing .tasks-board
-     * structure from your CSS.
-     */
-
-    const columns = {
-
-        todo: createTaskColumn(
-            "To Do",
-            "bi-list-task",
-            "todo"
-        ),
-
-        progress: createTaskColumn(
-            "In Progress",
-            "bi-arrow-repeat",
-            "progress"
-        ),
-
-        review: createTaskColumn(
-            "Review",
-            "bi-eye",
-            "review"
-        ),
-
-        completed: createTaskColumn(
-            "Completed",
-            "bi-check-circle",
-            "completed"
-        )
-
-    };
+    }
 
 
     taskList.forEach(task => {
 
-        const status =
-            columns[task.status]
-                ? task.status
-                : "todo";
-
-
-        columns[status]
-            .querySelector(
-                ".task-list"
-            )
-            .appendChild(
-                createTaskCard(task)
-            );
-
-
-        const count =
-            columns[status]
-                .querySelector(
-                    ".task-count"
-                );
-
-
-        count.textContent =
-            columns[status]
-                .querySelectorAll(
-                    ".task-card"
-                ).length;
+        grid.appendChild(
+            createTaskCard(task)
+        );
 
     });
 
 
-    Object.values(columns)
-        .forEach(column => {
-
-            tasksGrid.appendChild(
-                column
-            );
-
-        });
+    attachTaskActions();
 
 }
 
 
-function createTaskColumn(
-    title,
-    icon,
-    status
-) {
+/* =========================================================
+   CREATE TASK COLUMN
+========================================================= */
+
+function createTaskColumn(title, taskList) {
 
     const column =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
 
     column.className =
@@ -3483,26 +2631,26 @@ function createTaskColumn(
 
         <div class="task-column-header">
 
-            <div class="task-column-title">
+            <h3>
+                ${title}
+            </h3>
 
-                <i class="bi ${icon}"></i>
-
-                <h3>
-                    ${title}
-                </h3>
-
-                <span class="task-count">
-                    0
-                </span>
-
-            </div>
+            <span>
+                ${taskList.length}
+            </span>
 
         </div>
 
-
-        <div class="task-list"></div>
-
     `;
+
+
+    taskList.forEach(task => {
+
+        column.appendChild(
+            createTaskCard(task)
+        );
+
+    });
 
 
     return column;
@@ -3510,9 +2658,19 @@ function createTaskColumn(
 }
 
 
-function createTaskCard(
-    task
-) {
+/* =========================================================
+   CREATE TASK CARD
+========================================================= */
+
+function createTaskCard(task) {
+
+    const card =
+        document.createElement("div");
+
+
+    card.className =
+        "task-card";
+
 
     const project =
         getTaskProject(task);
@@ -3522,215 +2680,122 @@ function createTaskCard(
         getTaskAssignee(task);
 
 
-    const priority =
-        String(
-            task.priority ||
-            "medium"
-        ).toLowerCase();
-
-
     const overdue =
         isTaskOverdue(task);
-
-
-    const card =
-        document.createElement(
-            "article"
-        );
-
-
-    card.className =
-        "task-card";
-
-
-    const status =
-        String(
-            task.status ||
-            "todo"
-        ).toLowerCase();
-
-
-    let progress = 0;
-
-
-    if (status === "progress") {
-        progress = 50;
-    }
-
-    if (status === "review") {
-        progress = 80;
-    }
-
-    if (status === "completed") {
-        progress = 100;
-    }
 
 
     card.innerHTML = `
 
         <div class="task-card-header">
 
-            <h4>
-                ${escapeHTML(
-                    task.title ||
-                    "Untitled Task"
-                )}
-            </h4>
+            <span class="task-priority ${safePriority(task.priority)}">
 
-
-            <span class="task-priority ${safePriority(
-                priority
-            )}">
-
-                ${getTaskPriorityLabel(
-                    priority
-                )}
+                ${getTaskPriorityLabel(task.priority)}
 
             </span>
 
+
+            ${
+                canManageTasks()
+                    ? `
+                        <div class="task-actions">
+
+                            <button
+                                class="icon-btn edit-task"
+                                data-id="${task.id}"
+                            >
+                                <i class="bi bi-pencil"></i>
+                            </button>
+
+                            <button
+                                class="icon-btn delete-task"
+                                data-id="${task.id}"
+                            >
+                                <i class="bi bi-trash"></i>
+                            </button>
+
+                        </div>
+                      `
+                    : ""
+            }
+
         </div>
+
+
+        <h3>
+
+            ${escapeHTML(task.title || "Untitled Task")}
+
+        </h3>
 
 
         ${
             task.description
                 ? `
-                    <p class="task-description">
-
-                        ${escapeHTML(
-                            task.description
-                        )}
-
+                    <p>
+                        ${escapeHTML(task.description)}
                     </p>
-                `
+                  `
                 : ""
         }
 
 
         <div class="task-meta">
 
-            <span class="task-project">
+            ${
+                project
+                    ? `
+                        <span>
 
-                <i class="bi bi-folder"></i>
+                            <i class="bi bi-folder"></i>
 
-                ${
-                    project
-                        ? escapeHTML(
-                            project.name
-                        )
-                        : "No project"
-                }
+                            ${escapeHTML(project.name)}
 
-            </span>
-
-        </div>
+                        </span>
+                      `
+                    : ""
+            }
 
 
-        <div class="task-progress">
+            ${
+                assignee
+                    ? `
+                        <span>
 
-            <div class="task-progress-top">
+                            <i class="bi bi-person"></i>
 
-                <span>
-                    Progress
-                </span>
+                            ${escapeHTML(assignee.name)}
 
-                <strong>
-                    ${progress}%
-                </strong>
-
-            </div>
+                        </span>
+                      `
+                    : ""
+            }
 
 
-            <div class="task-progress-bar">
+            ${
+                task.dueDate
+                    ? `
+                        <span class="${overdue ? "overdue" : ""}">
 
-                <div
-                    class="task-progress-fill"
-                    style="width:${progress}%"
-                ></div>
+                            <i class="bi bi-calendar3"></i>
 
-            </div>
+                            ${formatDate(task.dueDate)}
+
+                        </span>
+                      `
+                    : ""
+            }
 
         </div>
 
 
         <div class="task-footer">
 
-            <div class="task-assignee">
+            <span class="status-badge ${safeStatus(task.status)}">
 
-                <div class="task-assignee-avatar">
+                ${getTaskStatusLabel(task.status)}
 
-                    ${
-                        assignee
-                            ? getInitials(
-                                assignee.name
-                            )
-                            : "?"
-                    }
-
-                </div>
-
-
-                <span>
-
-                    ${
-                        assignee
-                            ? escapeHTML(
-                                assignee.name
-                            )
-                            : "Unassigned"
-                    }
-
-                </span>
-
-            </div>
-
-
-            ${
-                task.dueDate
-                    ? `
-                        <div class="task-due-date ${
-                            overdue
-                                ? "overdue"
-                                : ""
-                        }">
-
-                            <i class="bi bi-calendar3"></i>
-
-                            ${formatDate(
-                                task.dueDate
-                            )}
-
-                        </div>
-                    `
-                    : ""
-            }
-
-
-            <div class="task-actions">
-
-                <button
-                    type="button"
-                    class="task-action-btn edit-task"
-                    data-id="${task.id}"
-                    title="Edit task"
-                >
-
-                    <i class="bi bi-pencil"></i>
-
-                </button>
-
-
-                <button
-                    type="button"
-                    class="task-action-btn delete delete-task"
-                    data-id="${task.id}"
-                    title="Delete task"
-                >
-
-                    <i class="bi bi-trash"></i>
-
-                </button>
-
-            </div>
+            </span>
 
         </div>
 
@@ -3742,135 +2807,125 @@ function createTaskCard(
 }
 
 
+/* =========================================================
+   TASK ACTIONS
+========================================================= */
+
 function attachTaskActions() {
 
-    document
-        .querySelectorAll(
-            ".edit-task"
-        )
-        .forEach(button => {
+    $$(".edit-task").forEach(button => {
 
-            button.addEventListener(
-                "click",
-                () => {
+        button.addEventListener(
+            "click",
+            () => {
 
-                    editTask(
-                        Number(
-                            button.dataset.id
-                        )
-                    );
+                editTask(
+                    Number(button.dataset.id)
+                );
 
-                }
-            );
+            }
+        );
 
-        });
+    });
 
 
-    document
-        .querySelectorAll(
-            ".delete-task"
-        )
-        .forEach(button => {
+    $$(".delete-task").forEach(button => {
 
-            button.addEventListener(
-                "click",
-                () => {
+        button.addEventListener(
+            "click",
+            () => {
 
-                    deleteTask(
-                        Number(
-                            button.dataset.id
-                        )
-                    );
+                deleteTask(
+                    Number(button.dataset.id)
+                );
 
-                }
-            );
+            }
+        );
 
-        });
+    });
 
 }
 
 
 /* =========================================================
-   TASK FILTERING
+   TASK FILTER
 ========================================================= */
 
 function filterTasks() {
 
+    if (!canManageTasks()) {
+
+        return;
+
+    }
+
+
     const search =
-        taskSearch.value
-            .trim()
-            .toLowerCase();
+        ($("#taskSearch")?.value || "")
+            .toLowerCase()
+            .trim();
 
 
     const status =
-        taskStatusFilter.value;
+        $("#taskStatusFilter")?.value ||
+        "all";
 
 
     const priority =
-        taskPriorityFilter.value;
+        $("#taskPriorityFilter")?.value ||
+        "all";
 
 
     const member =
-        taskMemberFilter.value;
+        $("#taskMemberFilter")?.value ||
+        "all";
 
 
     const filtered =
         tasks.filter(task => {
 
-            const project =
-                getTaskProject(task);
-
-
-            const assignee =
-                getTaskAssignee(task);
-
-
-            const searchable = [
-
-                task.title,
-
-                task.description,
-
-                task.notes,
-
-                project?.name,
-
-                assignee?.name
-
-            ]
-                .filter(Boolean)
-                .join(" ")
-                .toLowerCase();
-
-
             const matchesSearch =
-                searchable.includes(
-                    search
-                );
+
+                !search ||
+
+                (task.title || "")
+                    .toLowerCase()
+                    .includes(search) ||
+
+                (task.description || "")
+                    .toLowerCase()
+                    .includes(search);
 
 
             const matchesStatus =
+
                 status === "all" ||
+
                 task.status === status;
 
 
             const matchesPriority =
+
                 priority === "all" ||
+
                 task.priority === priority;
 
 
             const matchesMember =
+
                 member === "all" ||
-                String(
-                    task.assigneeId
-                ) === String(member);
+
+                String(task.assignee || "") ===
+                String(member);
 
 
             return (
+
                 matchesSearch &&
                 matchesStatus &&
                 matchesPriority &&
                 matchesMember
+
             );
 
         });
@@ -3878,32 +2933,30 @@ function filterTasks() {
 
     displayTasks(filtered);
 
-    updateTaskStats();
-
-    attachTaskActions();
-
 }
 
 
 /* =========================================================
-   TASK SELECT OPTIONS
+   TASK PROJECT OPTIONS
 ========================================================= */
 
 function populateTaskProjectOptions() {
 
-    if (!taskProject) {
-        return;
-    }
+    const select =
+        $("#taskProject");
 
 
-    const currentValue =
-        taskProject.value;
+    if (!select) return;
 
 
-    taskProject.innerHTML = `
+    const current =
+        select.value;
+
+
+    select.innerHTML = `
 
         <option value="">
-            No Project
+            Select project
         </option>
 
     `;
@@ -3912,9 +2965,7 @@ function populateTaskProjectOptions() {
     jobs.forEach(job => {
 
         const option =
-            document.createElement(
-                "option"
-            );
+            document.createElement("option");
 
 
         option.value =
@@ -3922,44 +2973,42 @@ function populateTaskProjectOptions() {
 
 
         option.textContent =
-            `${job.name} — ${job.client}`;
+            job.name;
 
 
-        taskProject.appendChild(
-            option
-        );
+        select.appendChild(option);
 
     });
 
 
-    if (
-        jobs.some(
-            job =>
-                String(job.id) ===
-                String(currentValue)
-        )
-    ) {
+    if (current) {
 
-        taskProject.value =
-            currentValue;
+        select.value =
+            current;
 
     }
 
 }
 
 
+/* =========================================================
+   TASK MEMBER OPTIONS
+========================================================= */
+
 function populateTaskMemberOptions() {
 
-    if (!taskAssignee) {
-        return;
-    }
+    const select =
+        $("#taskAssignee");
 
 
-    const currentValue =
-        taskAssignee.value;
+    if (!select) return;
 
 
-    taskAssignee.innerHTML = `
+    const current =
+        select.value;
+
+
+    select.innerHTML = `
 
         <option value="">
             Unassigned
@@ -3971,9 +3020,7 @@ function populateTaskMemberOptions() {
     teamMembers.forEach(member => {
 
         const option =
-            document.createElement(
-                "option"
-            );
+            document.createElement("option");
 
 
         option.value =
@@ -3981,48 +3028,42 @@ function populateTaskMemberOptions() {
 
 
         option.textContent =
-            `${member.name}${
-                member.role
-                    ? ` — ${member.role}`
-                    : ""
-            }`;
+            member.name;
 
 
-        taskAssignee.appendChild(
-            option
-        );
+        select.appendChild(option);
 
     });
 
 
-    if (
-        teamMembers.some(
-            member =>
-                String(member.id) ===
-                String(currentValue)
-        )
-    ) {
+    if (current) {
 
-        taskAssignee.value =
-            currentValue;
+        select.value =
+            current;
 
     }
 
 }
 
 
+/* =========================================================
+   TASK MEMBER FILTER
+========================================================= */
+
 function populateTaskMemberFilter() {
 
-    if (!taskMemberFilter) {
-        return;
-    }
+    const select =
+        $("#taskMemberFilter");
 
 
-    const currentValue =
-        taskMemberFilter.value;
+    if (!select) return;
 
 
-    taskMemberFilter.innerHTML = `
+    const current =
+        select.value;
+
+
+    select.innerHTML = `
 
         <option value="all">
             All Members
@@ -4034,9 +3075,7 @@ function populateTaskMemberFilter() {
     teamMembers.forEach(member => {
 
         const option =
-            document.createElement(
-                "option"
-            );
+            document.createElement("option");
 
 
         option.value =
@@ -4047,41 +3086,46 @@ function populateTaskMemberFilter() {
             member.name;
 
 
-        taskMemberFilter.appendChild(
-            option
-        );
+        select.appendChild(option);
 
     });
 
 
-    const exists =
-        teamMembers.some(
-            member =>
-                String(member.id) ===
-                String(currentValue)
-        );
+    if (current) {
 
+        select.value =
+            current;
 
-    taskMemberFilter.value =
-        exists
-            ? currentValue
-            : "all";
+    }
 
 }
 
 
 /* =========================================================
-   TASK MODAL
+   OPEN TASK MODAL
 ========================================================= */
 
 function openTaskModal() {
 
-    taskForm.reset();
+    if (!canManageTasks()) {
 
-    taskId.value = "";
+        showPermissionDenied(
+            "Tasks"
+        );
 
-    taskModalTitle.textContent =
-        "Add New Task";
+        return;
+
+    }
+
+
+    $("#taskForm")?.reset();
+
+
+    if ($("#taskId")) {
+
+        $("#taskId").value = "";
+
+    }
 
 
     populateTaskProjectOptions();
@@ -4089,40 +3133,43 @@ function openTaskModal() {
     populateTaskMemberOptions();
 
 
-    openModal(taskModal);
+    if ($("#taskModalTitle")) {
+
+        $("#taskModalTitle").textContent =
+            "Add Task";
+
+    }
+
+
+    openModal("taskModal");
 
 }
 
+
+/* =========================================================
+   EDIT TASK
+========================================================= */
 
 function editTask(id) {
 
-    const task =
-        tasks.find(
-            item =>
-                Number(item.id) ===
-                Number(id)
+    if (!canManageTasks()) {
+
+        showPermissionDenied(
+            "Tasks"
         );
 
-
-    if (!task) {
         return;
+
     }
 
 
-    taskModalTitle.textContent =
-        "Edit Task";
+    const task =
+        tasks.find(
+            item => item.id === id
+        );
 
 
-    taskId.value =
-        task.id;
-
-
-    taskTitle.value =
-        task.title || "";
-
-
-    taskDescription.value =
-        task.description || "";
+    if (!task) return;
 
 
     populateTaskProjectOptions();
@@ -4130,68 +3177,95 @@ function editTask(id) {
     populateTaskMemberOptions();
 
 
-    taskProject.value =
-        task.projectId || "";
+    $("#taskId").value =
+        task.id;
 
 
-    taskAssignee.value =
-        task.assigneeId || "";
+    $("#taskTitle").value =
+        task.title || "";
 
 
-    taskPriority.value =
-        task.priority ||
-        "medium";
+    $("#taskDescription").value =
+        task.description || "";
 
 
-    taskDueDate.value =
+    $("#taskProject").value =
+        task.project || "";
+
+
+    $("#taskAssignee").value =
+        task.assignee || "";
+
+
+    $("#taskPriority").value =
+        task.priority || "medium";
+
+
+    $("#taskDueDate").value =
         task.dueDate || "";
 
 
-    taskStatus.value =
-        task.status ||
-        "todo";
+    $("#taskStatus").value =
+        task.status || "pending";
 
 
-    taskNotes.value =
+    $("#taskNotes").value =
         task.notes || "";
 
 
-    openModal(taskModal);
+    if ($("#taskModalTitle")) {
+
+        $("#taskModalTitle").textContent =
+            "Edit Task";
+
+    }
+
+
+    openModal("taskModal");
 
 }
 
 
+/* =========================================================
+   DELETE TASK
+========================================================= */
+
 function deleteTask(id) {
 
-    const task =
-        tasks.find(
-            item =>
-                Number(item.id) ===
-                Number(id)
+    if (!canManageTasks()) {
+
+        showPermissionDenied(
+            "Tasks"
         );
 
-
-    if (!task) {
         return;
+
     }
 
 
-    const confirmed =
-        window.confirm(
-            `Delete task "${task.title}"?`
+    const task =
+        tasks.find(
+            item => item.id === id
         );
 
 
-    if (!confirmed) {
+    if (!task) return;
+
+
+    if (
+        !confirm(
+            `Delete "${task.title}"?`
+        )
+    ) {
+
         return;
+
     }
 
 
     tasks =
         tasks.filter(
-            item =>
-                Number(item.id) !==
-                Number(id)
+            item => item.id !== id
         );
 
 
@@ -4206,101 +3280,113 @@ function deleteTask(id) {
    TASK FORM
 ========================================================= */
 
-taskForm.addEventListener(
-    "submit",
-    event => {
-
-        event.preventDefault();
+const taskForm =
+    $("#taskForm");
 
 
-        const title =
-            taskTitle.value.trim();
+if (taskForm) {
+
+    taskForm.addEventListener(
+        "submit",
+        event => {
+
+            event.preventDefault();
 
 
-        if (!title) {
-            return;
-        }
+            if (!canManageTasks()) {
 
-
-        const data = {
-
-            title,
-
-            description:
-                taskDescription.value.trim(),
-
-            projectId:
-                taskProject.value || "",
-
-            assigneeId:
-                taskAssignee.value || "",
-
-            priority:
-                taskPriority.value ||
-                "medium",
-
-            dueDate:
-                taskDueDate.value || "",
-
-            status:
-                taskStatus.value ||
-                "todo",
-
-            notes:
-                taskNotes.value.trim()
-
-        };
-
-
-        const existingId =
-            taskId.value;
-
-
-        if (existingId) {
-
-            const index =
-                tasks.findIndex(
-                    item =>
-                        Number(item.id) ===
-                        Number(existingId)
+                showPermissionDenied(
+                    "Tasks"
                 );
 
-
-            if (index !== -1) {
-
-                tasks[index] = {
-
-                    ...tasks[index],
-
-                    ...data
-
-                };
+                return;
 
             }
 
-        } else {
 
-            tasks.push({
+            const id =
+                Number($("#taskId")?.value);
 
-                id: Date.now(),
 
-                ...data
+            const taskData = {
 
-            });
+                title:
+                    $("#taskTitle").value.trim(),
+
+                description:
+                    $("#taskDescription").value.trim(),
+
+                project:
+                    $("#taskProject").value,
+
+                assignee:
+                    $("#taskAssignee").value,
+
+                priority:
+                    $("#taskPriority").value,
+
+                dueDate:
+                    $("#taskDueDate").value,
+
+                status:
+                    $("#taskStatus").value,
+
+                notes:
+                    $("#taskNotes").value.trim()
+
+            };
+
+
+            if (!taskData.title) {
+
+                alert(
+                    "Please enter a task title."
+                );
+
+                return;
+
+            }
+
+
+            if (id) {
+
+                const index =
+                    tasks.findIndex(
+                        task =>
+                            task.id === id
+                    );
+
+
+                if (index !== -1) {
+
+                    taskData.id =
+                        id;
+
+                    tasks[index] =
+                        taskData;
+
+                }
+
+            } else {
+
+                taskData.id =
+                    Date.now();
+
+                tasks.push(taskData);
+
+            }
+
+
+            saveTasks();
+
+            closeModal("taskModal");
+
+            renderAll();
 
         }
+    );
 
-
-        saveTasks();
-
-        closeModal(taskModal);
-
-        renderAll();
-
-        showSection("tasks");
-
-    }
-);
+}
 
 
 /* =========================================================
@@ -4318,295 +3404,198 @@ function renderDashboard() {
     updateTaskStats();
 
 
-    /* -----------------------------------------------------
-       Recent Projects
-    ----------------------------------------------------- */
+    /*
+       Recent projects
+    */
 
-    const latestJobs =
-        [...jobs]
-            .sort(
-                (a, b) =>
-                    Number(b.id) -
-                    Number(a.id)
-            )
-            .slice(0, 5);
+    const recentProjects =
+        $("#recentProjects");
 
 
-    recentProjects.innerHTML =
-        "";
+    if (recentProjects) {
+
+        recentProjects.innerHTML = "";
 
 
-    if (!latestJobs.length) {
+        jobs
+            .slice()
+            .reverse()
+            .slice(0, 5)
+            .forEach(job => {
 
-        recentProjects.innerHTML = `
-
-            <div class="empty-state">
-
-                <div class="empty-icon">
-
-                    <i class="bi bi-kanban"></i>
-
-                </div>
-
-                <p>
-                    No projects yet.
-                </p>
-
-            </div>
-
-        `;
-
-    } else {
-
-        latestJobs.forEach(job => {
-
-            recentProjects.innerHTML += `
-
-                <div class="recent-project-item">
-
-                    <div class="project-mini-icon">
-
-                        <i class="bi ${safeIcon(
-                            job.icon
-                        )}"></i>
-
-                    </div>
+                const item =
+                    document.createElement("div");
 
 
-                    <div class="project-mini-info">
+                item.className =
+                    "recent-project";
+
+
+                item.innerHTML = `
+
+                    <div>
 
                         <strong>
-
-                            ${escapeHTML(
-                                job.name
-                            )}
-
+                            ${escapeHTML(job.name)}
                         </strong>
 
-
-                        <span>
-
-                            ${escapeHTML(
-                                job.client
-                            )}
-
-                        </span>
+                        <small>
+                            ${escapeHTML(job.client)}
+                        </small>
 
                     </div>
 
 
-                    <span class="status status-${safeStatus(
-                        job.status ||
-                        "pending"
-                    )}">
+                    <span class="status-badge ${safeStatus(job.status)}">
 
-                        ${capitalize(
-                            job.status ||
-                            "pending"
-                        )}
+                        ${capitalize(job.status)}
 
                     </span>
 
-                </div>
+                `;
 
-            `;
 
-        });
+                recentProjects.appendChild(item);
+
+            });
 
     }
 
 
-    /* -----------------------------------------------------
-       Dashboard Clients
-    ----------------------------------------------------- */
+    /*
+       Dashboard clients
+    */
 
-    dashboardClients.innerHTML =
-        "";
-
-
-    clients
-        .slice(0, 5)
-        .forEach(client => {
-
-            dashboardClients.innerHTML += `
-
-                <div class="dashboard-client-item">
-
-                    <div class="client-mini-avatar">
-
-                        ${getInitials(
-                            client.name
-                        )}
-
-                    </div>
+    const dashboardClients =
+        $("#dashboardClients");
 
 
-                    <div class="client-mini-info">
+    if (dashboardClients) {
+
+        dashboardClients.textContent =
+            clients.length;
+
+    }
+
+
+    /*
+       Dashboard team count
+    */
+
+    const dashboardTeamCount =
+        $("#dashboardTeamCount");
+
+
+    if (dashboardTeamCount) {
+
+        dashboardTeamCount.textContent =
+            teamMembers.length;
+
+    }
+
+
+    /*
+       Dashboard task counts
+    */
+
+    const dashboardTaskCount =
+        $("#dashboardTaskCount");
+
+
+    if (dashboardTaskCount) {
+
+        dashboardTaskCount.textContent =
+            tasks.length;
+
+    }
+
+
+    const activeTasks =
+        tasks.filter(
+            task =>
+                task.status !== "completed"
+        ).length;
+
+
+    const completedTasks =
+        tasks.filter(
+            task =>
+                task.status === "completed"
+        ).length;
+
+
+    if ($("#dashboardActiveTasks")) {
+
+        $("#dashboardActiveTasks").textContent =
+            activeTasks;
+
+    }
+
+
+    if ($("#dashboardCompletedTasks")) {
+
+        $("#dashboardCompletedTasks").textContent =
+            completedTasks;
+
+    }
+
+
+    /*
+       Dashboard recent tasks
+    */
+
+    const dashboardTasks =
+        $("#dashboardTasks");
+
+
+    if (dashboardTasks) {
+
+        dashboardTasks.innerHTML = "";
+
+
+        tasks
+            .slice()
+            .reverse()
+            .slice(0, 5)
+            .forEach(task => {
+
+                const item =
+                    document.createElement("div");
+
+
+                item.className =
+                    "recent-task";
+
+
+                item.innerHTML = `
+
+                    <div>
 
                         <strong>
-
-                            ${escapeHTML(
-                                client.name
-                            )}
-
+                            ${escapeHTML(task.title)}
                         </strong>
 
-
-                        <span>
-
-                            ${escapeHTML(
-                                client.company ||
-                                "Client"
-                            )}
-
-                        </span>
+                        <small>
+                            ${getTaskStatusLabel(task.status)}
+                        </small>
 
                     </div>
 
 
-                    <span class="status status-${safeStatus(
-                        client.status ||
-                        "active"
-                    )}">
+                    <span class="task-priority ${safePriority(task.priority)}">
 
-                        ${capitalize(
-                            client.status ||
-                            "active"
-                        )}
+                        ${getTaskPriorityLabel(task.priority)}
 
                     </span>
 
-                </div>
-
-            `;
-
-        });
+                `;
 
 
-    /* -----------------------------------------------------
-       Dashboard Tasks
-    ----------------------------------------------------- */
+                dashboardTasks.appendChild(item);
 
-    if (!dashboardTasks) {
-        return;
-    }
-
-
-    dashboardTasks.innerHTML =
-        "";
-
-
-    const latestTasks =
-        [...tasks]
-            .sort(
-                (a, b) =>
-                    Number(b.id) -
-                    Number(a.id)
-            )
-            .slice(0, 5);
-
-
-    if (!latestTasks.length) {
-
-        dashboardTasks.innerHTML = `
-
-            <div class="empty-state">
-
-                <div class="empty-icon">
-
-                    <i class="bi bi-check2-square"></i>
-
-                </div>
-
-                <p>
-                    No tasks yet.
-                </p>
-
-            </div>
-
-        `;
-
-        return;
+            });
 
     }
-
-
-    latestTasks.forEach(task => {
-
-        const project =
-            getTaskProject(task);
-
-
-        const assignee =
-            getTaskAssignee(task);
-
-
-        dashboardTasks.innerHTML += `
-
-            <div class="recent-project-item">
-
-                <div class="project-mini-icon">
-
-                    <i class="bi bi-check2-square"></i>
-
-                </div>
-
-
-                <div class="project-mini-info">
-
-                    <strong>
-
-                        ${escapeHTML(
-                            task.title
-                        )}
-
-                    </strong>
-
-
-                    <span>
-
-                        ${
-                            assignee
-                                ? escapeHTML(
-                                    assignee.name
-                                )
-                                : "Unassigned"
-                        }
-
-                        ${
-                            project
-                                ? ` • ${escapeHTML(
-                                    project.name
-                                )}`
-                                : ""
-                        }
-
-                    </span>
-
-                </div>
-
-
-                <span class="status status-${
-                    task.status ===
-                    "completed"
-                        ? "completed"
-                        : task.status ===
-                          "todo"
-                            ? "pending"
-                            : "active"
-                }">
-
-                    ${getTaskStatusLabel(
-                        task.status
-                    )}
-
-                </span>
-
-            </div>
-
-        `;
-
-    });
 
 }
 
@@ -4617,186 +3606,116 @@ function renderDashboard() {
 
 function displayPayments() {
 
-    updateStats();
+    const totalValue =
+        jobs.reduce(
+            (sum, job) =>
+                sum +
+                Number(job.budget || 0),
+            0
+        );
 
 
-    paymentList.innerHTML =
-        "";
+    const totalPaid =
+        jobs.reduce(
+            (sum, job) =>
+                sum +
+                Number(job.paid || 0),
+            0
+        );
 
 
-    if (!jobs.length) {
+    const outstanding =
+        Math.max(
+            0,
+            totalValue - totalPaid
+        );
 
-        paymentList.innerHTML = `
 
-            <div class="empty-state">
+    if ($("#totalProjectValue")) {
 
-                <div class="empty-icon">
-
-                    <i class="bi bi-wallet2"></i>
-
-                </div>
-
-                <h3>
-                    No payment records
-                </h3>
-
-                <p>
-                    Add a project to start tracking payments.
-                </p>
-
-            </div>
-
-        `;
-
-        return;
+        $("#totalProjectValue").textContent =
+            formatMoney(totalValue);
 
     }
 
 
+    if ($("#paymentTotalPaid")) {
+
+        $("#paymentTotalPaid").textContent =
+            formatMoney(totalPaid);
+
+    }
+
+
+    if ($("#paymentOutstanding")) {
+
+        $("#paymentOutstanding").textContent =
+            formatMoney(outstanding);
+
+    }
+
+
+    const list =
+        $("#paymentList");
+
+
+    if (!list) return;
+
+
+    list.innerHTML = "";
+
+
     jobs.forEach(job => {
 
-        const budget =
-            Number(job.budget) || 0;
-
-
-        const paid =
-            Math.min(
-                Number(job.paid) || 0,
-                budget
-            );
-
-
-        const balance =
+        const remaining =
             Math.max(
-                budget - paid,
-                0
+                0,
+                Number(job.budget || 0) -
+                Number(job.paid || 0)
             );
 
 
-        const paymentStatus =
-            getPaymentStatus(
-                budget,
-                paid
-            );
+        const item =
+            document.createElement("div");
 
 
-        let statusClass =
-            "pending";
+        item.className =
+            "payment-item";
 
 
-        if (
-            paymentStatus ===
-            "Fully Paid"
-        ) {
+        item.innerHTML = `
 
-            statusClass =
-                "paid";
+            <div>
 
-        } else if (
-            paymentStatus ===
-            "Partially Paid"
-        ) {
+                <strong>
+                    ${escapeHTML(job.name)}
+                </strong>
 
-            statusClass =
-                "partial";
+                <small>
+                    ${escapeHTML(job.client)}
+                </small>
 
-        }
+            </div>
 
 
-        paymentList.innerHTML += `
+            <div>
 
-            <div class="payment-item">
+                <strong>
+                    ${formatMoney(job.paid)}
+                </strong>
 
-                <div class="payment-project">
-
-                    <div class="payment-project-icon">
-
-                        <i class="bi ${safeIcon(
-                            job.icon
-                        )}"></i>
-
-                    </div>
-
-
-                    <div>
-
-                        <strong>
-
-                            ${escapeHTML(
-                                job.name
-                            )}
-
-                        </strong>
-
-
-                        <span>
-
-                            ${escapeHTML(
-                                job.client
-                            )}
-
-                        </span>
-
-                    </div>
-
-                </div>
-
-
-                <div class="payment-amount">
-
-                    <span>
-                        Paid / Budget
-                    </span>
-
-
-                    <strong>
-
-                        ${formatMoney(
-                            paid
-                        )}
-
-                        /
-
-                        ${formatMoney(
-                            budget
-                        )}
-
-                    </strong>
-
-                </div>
-
-
-                <div>
-
-                    <div class="payment-status ${statusClass}">
-
-                        ${paymentStatus}
-
-                    </div>
-
-
-                    <div class="payment-amount">
-
-                        <span>
-                            Balance
-                        </span>
-
-
-                        <strong>
-
-                            ${formatMoney(
-                                balance
-                            )}
-
-                        </strong>
-
-                    </div>
-
-                </div>
+                <small>
+                    ${remaining > 0
+                        ? `${formatMoney(remaining)} outstanding`
+                        : "Fully paid"}
+                </small>
 
             </div>
 
         `;
+
+
+        list.appendChild(item);
 
     });
 
@@ -4804,58 +3723,40 @@ function displayPayments() {
 
 
 /* =========================================================
-   CALENDAR
+   CALENDAR / DEADLINES
 ========================================================= */
 
 function displayDeadlines() {
 
-    deadlineList.innerHTML =
-        "";
+    const list =
+        $("#deadlineList");
 
 
-    const activeJobs =
+    if (!list) return;
+
+
+    list.innerHTML = "";
+
+
+    const sorted =
         jobs
-            .filter(
-                job =>
-                    String(
-                        job.status
-                    ).toLowerCase() !==
-                    "completed" &&
-
-                    String(
-                        job.status
-                    ).toLowerCase() !==
-                    "cancelled"
-            )
+            .filter(job => job.deadline)
+            .slice()
             .sort(
                 (a, b) =>
-                    new Date(
-                        a.deadline
-                    ) -
-                    new Date(
-                        b.deadline
-                    )
+                    new Date(a.deadline) -
+                    new Date(b.deadline)
             );
 
 
-    if (!activeJobs.length) {
+    if (!sorted.length) {
 
-        deadlineList.innerHTML = `
+        list.innerHTML = `
 
             <div class="empty-state">
 
-                <div class="empty-icon">
-
-                    <i class="bi bi-calendar-check"></i>
-
-                </div>
-
-                <h3>
-                    No upcoming deadlines
-                </h3>
-
                 <p>
-                    You're all caught up.
+                    No upcoming deadlines.
                 </p>
 
             </div>
@@ -4867,126 +3768,47 @@ function displayDeadlines() {
     }
 
 
-    activeJobs.forEach(job => {
+    sorted.forEach(job => {
 
-        const deadline =
-            new Date(
-                `${job.deadline}T00:00:00`
-            );
+        const item =
+            document.createElement("div");
 
 
-        const now =
-            new Date();
+        item.className =
+            "deadline-item";
 
 
-        const today =
-            new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate()
-            );
+        item.innerHTML = `
+
+            <div>
+
+                <strong>
+                    ${escapeHTML(job.name)}
+                </strong>
+
+                <small>
+                    ${escapeHTML(job.client)}
+                </small>
+
+            </div>
 
 
-        const difference =
-            Math.ceil(
-                (
-                    deadline -
-                    today
-                ) /
-                86400000
-            );
+            <div>
 
+                <span>
 
-        let warning =
-            "";
+                    <i class="bi bi-calendar3"></i>
 
-
-        if (difference < 0) {
-
-            warning =
-                "Overdue";
-
-        } else if (
-            difference === 0
-        ) {
-
-            warning =
-                "Today";
-
-        } else if (
-            difference === 1
-        ) {
-
-            warning =
-                "Tomorrow";
-
-        } else {
-
-            warning =
-                `${difference} days left`;
-
-        }
-
-
-        deadlineList.innerHTML += `
-
-            <div class="deadline-item">
-
-                <div class="deadline-date">
-
-                    <span class="month">
-
-                        ${deadline.toLocaleDateString(
-                            "en-US",
-                            {
-                                month:
-                                    "short"
-                            }
-                        )}
-
-                    </span>
-
-
-                    <span class="day">
-
-                        ${deadline.getDate()}
-
-                    </span>
-
-                </div>
-
-
-                <div class="deadline-info">
-
-                    <strong>
-
-                        ${escapeHTML(
-                            job.name
-                        )}
-
-                    </strong>
-
-
-                    <span>
-
-                        ${escapeHTML(
-                            job.client
-                        )}
-
-                    </span>
-
-                </div>
-
-
-                <span class="deadline-warning">
-
-                    ${warning}
+                    ${formatDate(job.deadline)}
 
                 </span>
 
             </div>
 
         `;
+
+
+        list.appendChild(item);
 
     });
 
@@ -4997,302 +3819,200 @@ function displayDeadlines() {
    MODALS
 ========================================================= */
 
-function openModal(modal) {
+function openModal(id) {
 
-    if (!modal) {
-        return;
-    }
+    const modal =
+        document.getElementById(id);
 
 
-    modal.classList.add(
-        "active"
+    if (!modal) return;
+
+
+    modal.classList.add("active");
+
+    document.body.classList.add(
+        "modal-open"
     );
-
-
-    document.body.style.overflow =
-        "hidden";
 
 }
 
 
-function closeModal(modal) {
+function closeModal(id) {
 
-    if (!modal) {
-        return;
-    }
+    const modal =
+        document.getElementById(id);
 
 
-    modal.classList.remove(
-        "active"
+    if (!modal) return;
+
+
+    modal.classList.remove("active");
+
+    document.body.classList.remove(
+        "modal-open"
     );
-
-
-    document.body.style.overflow =
-        "";
 
 }
 
 
 function closeAllModals() {
 
-    document
-        .querySelectorAll(
-            ".modal-overlay"
-        )
-        .forEach(modal => {
+    $$(".modal").forEach(modal => {
 
-            modal.classList.remove(
-                "active"
-            );
+        modal.classList.remove("active");
 
-        });
+    });
 
 
-    document.body.style.overflow =
-        "";
+    document.body.classList.remove(
+        "modal-open"
+    );
 
 }
 
 
 /* =========================================================
-   JOB BUTTONS
+   MODAL BUTTONS
 ========================================================= */
 
-document
-    .getElementById(
-        "addJobBtn"
-    )
-    .addEventListener(
-        "click",
-        openAddModal
-    );
+/* Projects */
+
+$("#addJobBtn")?.addEventListener(
+    "click",
+    openAddModal
+);
 
 
-document
-    .getElementById(
-        "dashboardAddJobBtn"
-    )
-    .addEventListener(
-        "click",
-        openAddModal
-    );
+$("#dashboardAddJobBtn")?.addEventListener(
+    "click",
+    openAddModal
+);
 
 
-document
-    .getElementById(
-        "emptyAddJobBtn"
-    )
-    .addEventListener(
-        "click",
-        openAddModal
-    );
+$("#emptyAddJobBtn")?.addEventListener(
+    "click",
+    openAddModal
+);
 
 
-document
-    .getElementById(
-        "closeJobModal"
-    )
-    .addEventListener(
-        "click",
-        () =>
-            closeModal(
-                jobModal
-            )
-    );
+$("#closeJobModal")?.addEventListener(
+    "click",
+    () => closeModal("jobModal")
+);
 
 
-document
-    .getElementById(
-        "cancelJobBtn"
-    )
-    .addEventListener(
-        "click",
-        () =>
-            closeModal(
-                jobModal
-            )
-    );
+$("#cancelJobBtn")?.addEventListener(
+    "click",
+    () => closeModal("jobModal")
+);
+
+
+/* Clients */
+
+$("#addClientBtn")?.addEventListener(
+    "click",
+    openClientModal
+);
+
+
+$("#emptyAddClientBtn")?.addEventListener(
+    "click",
+    openClientModal
+);
+
+
+$("#closeClientModal")?.addEventListener(
+    "click",
+    () => closeModal("clientModal")
+);
+
+
+$("#cancelClientBtn")?.addEventListener(
+    "click",
+    () => closeModal("clientModal")
+);
+
+
+/* Team */
+
+$("#addMemberBtn")?.addEventListener(
+    "click",
+    openMemberModal
+);
+
+
+$("#emptyAddMemberBtn")?.addEventListener(
+    "click",
+    openMemberModal
+);
+
+
+$("#closeMemberModal")?.addEventListener(
+    "click",
+    () => closeModal("memberModal")
+);
+
+
+$("#cancelMemberBtn")?.addEventListener(
+    "click",
+    () => closeModal("memberModal")
+);
+
+
+/* Tasks */
+
+$("#addTaskBtn")?.addEventListener(
+    "click",
+    openTaskModal
+);
+
+
+$("#emptyAddTaskBtn")?.addEventListener(
+    "click",
+    openTaskModal
+);
+
+
+$("#closeTaskModal")?.addEventListener(
+    "click",
+    () => closeModal("taskModal")
+);
+
+
+$("#cancelTaskBtn")?.addEventListener(
+    "click",
+    () => closeModal("taskModal")
+);
 
 
 /* =========================================================
-   CLIENT BUTTONS
+   CLOSE MODAL WHEN CLICKING OUTSIDE
 ========================================================= */
 
-document
-    .getElementById(
-        "addClientBtn"
-    )
-    .addEventListener(
+$$(".modal").forEach(modal => {
+
+    modal.addEventListener(
         "click",
-        openClientModal
-    );
+        event => {
 
+            if (
+                event.target === modal
+            ) {
 
-document
-    .getElementById(
-        "emptyAddClientBtn"
-    )
-    .addEventListener(
-        "click",
-        openClientModal
-    );
+                modal.classList.remove(
+                    "active"
+                );
 
-
-document
-    .getElementById(
-        "closeClientModal"
-    )
-    .addEventListener(
-        "click",
-        () =>
-            closeModal(
-                clientModal
-            )
-    );
-
-
-document
-    .getElementById(
-        "cancelClientBtn"
-    )
-    .addEventListener(
-        "click",
-        () =>
-            closeModal(
-                clientModal
-            )
-    );
-
-
-/* =========================================================
-   TEAM BUTTONS
-========================================================= */
-
-document
-    .getElementById(
-        "addMemberBtn"
-    )
-    .addEventListener(
-        "click",
-        openMemberModal
-    );
-
-
-document
-    .getElementById(
-        "emptyAddMemberBtn"
-    )
-    .addEventListener(
-        "click",
-        openMemberModal
-    );
-
-
-document
-    .getElementById(
-        "closeMemberModal"
-    )
-    .addEventListener(
-        "click",
-        () =>
-            closeModal(
-                memberModal
-            )
-    );
-
-
-document
-    .getElementById(
-        "cancelMemberBtn"
-    )
-    .addEventListener(
-        "click",
-        () =>
-            closeModal(
-                memberModal
-            )
-    );
-
-
-/* =========================================================
-   TASK BUTTONS
-========================================================= */
-
-document
-    .getElementById(
-        "addTaskBtn"
-    )
-    .addEventListener(
-        "click",
-        openTaskModal
-    );
-
-
-document
-    .getElementById(
-        "emptyAddTaskBtn"
-    )
-    .addEventListener(
-        "click",
-        openTaskModal
-    );
-
-
-document
-    .getElementById(
-        "closeTaskModal"
-    )
-    .addEventListener(
-        "click",
-        () =>
-            closeModal(
-                taskModal
-            )
-    );
-
-
-document
-    .getElementById(
-        "cancelTaskBtn"
-    )
-    .addEventListener(
-        "click",
-        () =>
-            closeModal(
-                taskModal
-            )
-    );
-
-
-/* =========================================================
-   MODAL OUTSIDE CLICK
-========================================================= */
-
-document
-    .querySelectorAll(
-        ".modal-overlay"
-    )
-    .forEach(overlay => {
-
-        overlay.addEventListener(
-            "click",
-            event => {
-
-                if (
-                    event.target ===
-                    overlay
-                ) {
-
-                    closeModal(
-                        overlay
-                    );
-
-                }
+                document.body.classList.remove(
+                    "modal-open"
+                );
 
             }
-        );
 
-    });
+        }
+    );
+
+});
 
 
 /* =========================================================
@@ -5303,10 +4023,7 @@ document.addEventListener(
     "keydown",
     event => {
 
-        if (
-            event.key ===
-            "Escape"
-        ) {
+        if (event.key === "Escape") {
 
             closeAllModals();
 
@@ -5322,102 +4039,75 @@ document.addEventListener(
 
 function setTheme(theme) {
 
-    const isDark =
-        theme === "dark";
-
-
-    document.body.classList.toggle(
-        "dark",
-        isDark
-    );
+    document.documentElement.dataset.theme =
+        theme;
 
 
     localStorage.setItem(
-        "jobTrackTheme",
-        isDark
-            ? "dark"
-            : "light"
+        STORAGE_KEYS.theme,
+        theme
     );
 
 
-    updateThemeButtons(
-        isDark
-    );
+    updateThemeButtons();
 
 }
 
 
-function updateThemeButtons(
-    isDark
-) {
+function updateThemeButtons() {
 
-    const iconClass =
-        isDark
-            ? "bi-sun"
-            : "bi-moon-stars";
+    const theme =
+        document.documentElement.dataset.theme ||
+        "dark";
 
 
-    if (themeToggle) {
+    const buttons = [
 
-        themeToggle.innerHTML = `
+        $("#themeToggle"),
+        $("#topThemeToggle"),
+        $("#settingsThemeToggle")
 
-            <i class="bi ${iconClass}"></i>
-
-            <span>
-
-                ${
-                    isDark
-                        ? "Light Mode"
-                        : "Dark Mode"
-                }
-
-            </span>
-
-        `;
-
-    }
+    ];
 
 
-    if (topThemeToggle) {
+    buttons.forEach(button => {
 
-        topThemeToggle.innerHTML = `
-
-            <i class="bi ${iconClass}"></i>
-
-        `;
-
-    }
+        if (!button) return;
 
 
-    if (settingsThemeToggle) {
+        const icon =
+            button.querySelector("i");
 
-        settingsThemeToggle.innerHTML = `
 
-            <i class="bi ${iconClass}"></i>
+        if (!icon) return;
 
-            ${
-                isDark
-                    ? "Light Mode"
-                    : "Dark Mode"
-            }
 
-        `;
+        if (theme === "dark") {
 
-    }
+            icon.className =
+                "bi bi-sun";
+
+        } else {
+
+            icon.className =
+                "bi bi-moon";
+
+        }
+
+    });
 
 }
 
 
 function toggleTheme() {
 
-    const isDark =
-        document.body.classList.contains(
-            "dark"
-        );
+    const current =
+        document.documentElement.dataset.theme ||
+        "dark";
 
 
     setTheme(
-        isDark
+        current === "dark"
             ? "light"
             : "dark"
     );
@@ -5425,34 +4115,22 @@ function toggleTheme() {
 }
 
 
-if (themeToggle) {
-
-    themeToggle.addEventListener(
-        "click",
-        toggleTheme
-    );
-
-}
+$("#themeToggle")?.addEventListener(
+    "click",
+    toggleTheme
+);
 
 
-if (topThemeToggle) {
-
-    topThemeToggle.addEventListener(
-        "click",
-        toggleTheme
-    );
-
-}
+$("#topThemeToggle")?.addEventListener(
+    "click",
+    toggleTheme
+);
 
 
-if (settingsThemeToggle) {
-
-    settingsThemeToggle.addEventListener(
-        "click",
-        toggleTheme
-    );
-
-}
+$("#settingsThemeToggle")?.addEventListener(
+    "click",
+    toggleTheme
+);
 
 
 /* =========================================================
@@ -5461,18 +4139,12 @@ if (settingsThemeToggle) {
 
 function openMobileSidebar() {
 
-    if (!sidebar ||
-        !sidebarOverlay) {
-        return;
-    }
-
-
-    sidebar.classList.add(
-        "mobile-open"
+    $("#sidebar")?.classList.add(
+        "active"
     );
 
 
-    sidebarOverlay.classList.add(
+    $("#sidebarOverlay")?.classList.add(
         "active"
     );
 
@@ -5481,268 +4153,240 @@ function openMobileSidebar() {
 
 function closeMobileSidebar() {
 
-    if (!sidebar ||
-        !sidebarOverlay) {
-        return;
-    }
-
-
-    sidebar.classList.remove(
-        "mobile-open"
+    $("#sidebar")?.classList.remove(
+        "active"
     );
 
 
-    sidebarOverlay.classList.remove(
+    $("#sidebarOverlay")?.classList.remove(
         "active"
     );
 
 }
 
 
-if (mobileMenuBtn) {
-
-    mobileMenuBtn.addEventListener(
-        "click",
-        openMobileSidebar
-    );
-
-}
+$("#mobileMenuBtn")?.addEventListener(
+    "click",
+    openMobileSidebar
+);
 
 
-if (sidebarOverlay) {
-
-    sidebarOverlay.addEventListener(
-        "click",
-        closeMobileSidebar
-    );
-
-}
+$("#sidebarOverlay")?.addEventListener(
+    "click",
+    closeMobileSidebar
+);
 
 
 /* =========================================================
-   SEARCH / FILTERS
+   SEARCH / FILTER EVENTS
 ========================================================= */
 
-jobSearch.addEventListener(
+$("#jobSearch")?.addEventListener(
     "input",
     filterJobs
 );
 
 
-statusFilter.addEventListener(
+$("#statusFilter")?.addEventListener(
     "change",
     filterJobs
 );
 
 
-paymentFilter.addEventListener(
+$("#paymentFilter")?.addEventListener(
     "change",
     filterJobs
 );
 
 
-clientSearch.addEventListener(
+$("#clientSearch")?.addEventListener(
     "input",
     filterClients
 );
 
 
-teamSearch.addEventListener(
+$("#teamSearch")?.addEventListener(
     "input",
     filterTeamMembers
 );
 
 
-taskSearch.addEventListener(
+$("#taskSearch")?.addEventListener(
     "input",
     filterTasks
 );
 
 
-taskStatusFilter.addEventListener(
+$("#taskStatusFilter")?.addEventListener(
     "change",
     filterTasks
 );
 
 
-taskPriorityFilter.addEventListener(
+$("#taskPriorityFilter")?.addEventListener(
     "change",
     filterTasks
 );
 
 
-taskMemberFilter.addEventListener(
+$("#taskMemberFilter")?.addEventListener(
     "change",
     filterTasks
 );
 
 
 /* =========================================================
-   WALLET COPY
+   WALLET / COPY BUTTONS
 ========================================================= */
 
-const copyWalletButtons =
-    document.querySelectorAll(
-        ".copy-wallet-btn"
-    );
+$$("[data-copy]").forEach(button => {
+
+    button.addEventListener(
+        "click",
+        async () => {
+
+            const value =
+                button.dataset.copy;
 
 
-copyWalletButtons.forEach(
-    button => {
-
-        button.addEventListener(
-            "click",
-            async () => {
-
-                let walletAddress =
-                    button.dataset.wallet;
+            if (!value) return;
 
 
-                /*
-                 * If data-wallet is still a placeholder,
-                 * copy the actual visible address instead.
-                 */
+            try {
 
-                if (
-                    !walletAddress ||
-                    walletAddress.startsWith(
-                        "YOUR_"
-                    )
-                ) {
-
-                    const addressElement =
-                        button
-                            .closest(
-                                ".wallet-card"
-                            )
-                            ?.querySelector(
-                                ".wallet-address span"
-                            );
+                await navigator.clipboard.writeText(
+                    value
+                );
 
 
-                    walletAddress =
-                        addressElement
-                            ?.textContent
-                            .trim();
-
-                }
-
-
-                if (!walletAddress) {
-
-                    alert(
-                        "No wallet address available."
-                    );
-
-                    return;
-
-                }
-
-
-                const originalHTML =
+                const original =
                     button.innerHTML;
 
 
-                try {
-
-                    if (
-                        navigator.clipboard &&
-                        window.isSecureContext
-                    ) {
-
-                        await navigator.clipboard.writeText(
-                            walletAddress
-                        );
-
-                    } else {
-
-                        const textarea =
-                            document.createElement(
-                                "textarea"
-                            );
+                button.innerHTML =
+                    '<i class="bi bi-check"></i>';
 
 
-                        textarea.value =
-                            walletAddress;
+                setTimeout(() => {
+
+                    button.innerHTML =
+                        original;
+
+                }, 1500);
 
 
-                        textarea.style.position =
-                            "fixed";
+            } catch (error) {
 
-                        textarea.style.opacity =
-                            "0";
+                /*
+                   Fallback for browsers that
+                   block navigator.clipboard.
+                */
 
-
-                        document.body.appendChild(
-                            textarea
-                        );
-
-
-                        textarea.focus();
-
-                        textarea.select();
-
-
-                        document.execCommand(
-                            "copy"
-                        );
-
-
-                        textarea.remove();
-
-                    }
-
-
-                    button.classList.add(
-                        "copied"
+                const textarea =
+                    document.createElement(
+                        "textarea"
                     );
 
 
-                    button.innerHTML = `
-
-                        <i class="bi bi-check-lg"></i>
-
-                        <span>
-                            Copied
-                        </span>
-
-                    `;
+                textarea.value =
+                    value;
 
 
-                    setTimeout(
-                        () => {
-
-                            button.classList.remove(
-                                "copied"
-                            );
-
-                            button.innerHTML =
-                                originalHTML;
-
-                        },
-                        1800
-                    );
+                document.body.appendChild(
+                    textarea
+                );
 
 
-                } catch (error) {
+                textarea.select();
 
-                    console.error(
-                        "Copy failed:",
-                        error
-                    );
+                document.execCommand(
+                    "copy"
+                );
 
 
-                    alert(
-                        "Could not copy the wallet address."
-                    );
+                textarea.remove();
 
-                }
+            }
 
+        }
+    );
+
+});
+
+
+/* =========================================================
+   SAVE FUNCTIONS
+========================================================= */
+
+function saveJobs() {
+
+    localStorage.setItem(
+        STORAGE_KEYS.jobs,
+        JSON.stringify(jobs)
+    );
+
+}
+
+
+function saveClients() {
+
+    localStorage.setItem(
+        STORAGE_KEYS.clients,
+        JSON.stringify(clients)
+    );
+
+}
+
+
+function saveTeam() {
+
+    localStorage.setItem(
+        STORAGE_KEYS.team,
+        JSON.stringify(teamMembers)
+    );
+
+}
+
+
+function saveTasks() {
+
+    localStorage.setItem(
+        STORAGE_KEYS.tasks,
+        JSON.stringify(tasks)
+    );
+
+}
+
+
+/* =========================================================
+   CURRENT DATE
+========================================================= */
+
+function updateCurrentDate() {
+
+    const element =
+        $("#currentDate");
+
+
+    if (!element) return;
+
+
+    const now =
+        new Date();
+
+
+    element.textContent =
+        now.toLocaleDateString(
+            "en-US",
+            {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric"
             }
         );
 
-    }
-);
+}
 
 
 /* =========================================================
@@ -5751,57 +4395,46 @@ copyWalletButtons.forEach(
 
 function formatMoney(amount) {
 
-    const number =
-        Number(amount) || 0;
-
-
     return new Intl.NumberFormat(
         "en-US",
         {
             style: "currency",
             currency: "USD",
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
+            maximumFractionDigits: 0
         }
-    ).format(number);
+    ).format(
+        Number(amount) || 0
+    );
 
 }
 
 
-function formatDate(
-    dateString
-) {
+function formatDate(date) {
 
-    if (!dateString) {
+    if (!date) {
 
-        return "No deadline";
+        return "-";
 
     }
 
 
-    const date =
-        new Date(
-            `${dateString}T00:00:00`
-        );
+    const parsed =
+        new Date(date);
 
 
-    if (
-        Number.isNaN(
-            date.getTime()
-        )
-    ) {
+    if (Number.isNaN(parsed.getTime())) {
 
-        return "Invalid date";
+        return "-";
 
     }
 
 
-    return date.toLocaleDateString(
+    return parsed.toLocaleDateString(
         "en-US",
         {
+            year: "numeric",
             month: "short",
-            day: "numeric",
-            year: "numeric"
+            day: "numeric"
         }
     );
 
@@ -5810,50 +4443,33 @@ function formatDate(
 
 function capitalize(value) {
 
-    if (!value) {
-        return "";
-    }
+    if (!value) return "";
 
 
-    const text =
-        String(value);
-
-
-    return (
-        text.charAt(0).toUpperCase() +
-        text.slice(1)
-    );
+    return value
+        .replace(/_/g, " ")
+        .replace(
+            /\b\w/g,
+            char => char.toUpperCase()
+        );
 
 }
 
 
 function getInitials(name) {
 
-    if (!name) {
-        return "?";
-    }
+    if (!name) return "?";
 
 
-    const words =
-        String(name)
-            .trim()
-            .split(/\s+/)
-            .filter(Boolean);
-
-
-    if (words.length === 1) {
-
-        return words[0]
-            .slice(0, 2)
-            .toUpperCase();
-
-    }
-
-
-    return (
-        words[0][0] +
-        words[1][0]
-    ).toUpperCase();
+    return name
+        .split(" ")
+        .filter(Boolean)
+        .slice(0, 2)
+        .map(
+            word =>
+                word.charAt(0).toUpperCase()
+        )
+        .join("");
 
 }
 
@@ -5863,24 +4479,13 @@ function getRandomIcon() {
     const icons = [
 
         "bi-globe2",
-
         "bi-code-slash",
-
         "bi-window",
-
         "bi-phone",
-
         "bi-laptop",
-
-        "bi-palette",
-
-        "bi-shop",
-
-        "bi-bar-chart",
-
         "bi-brush",
-
-        "bi-kanban"
+        "bi-kanban",
+        "bi-layout-text-window"
 
     ];
 
@@ -5900,33 +4505,20 @@ function safeIcon(icon) {
     const allowed = [
 
         "bi-globe2",
-
         "bi-code-slash",
-
         "bi-window",
-
         "bi-phone",
-
         "bi-laptop",
-
-        "bi-palette",
-
-        "bi-shop",
-
-        "bi-bar-chart",
-
         "bi-brush",
-
         "bi-kanban",
-
-        "bi-folder"
+        "bi-layout-text-window"
 
     ];
 
 
     return allowed.includes(icon)
         ? icon
-        : "bi-folder";
+        : "bi-globe2";
 
 }
 
@@ -5936,22 +4528,16 @@ function safeStatus(status) {
     const allowed = [
 
         "active",
-
         "pending",
-
         "completed",
-
+        "in_progress",
         "cancelled"
 
     ];
 
 
-    return allowed.includes(
-        String(status)
-            .toLowerCase()
-    )
-        ? String(status)
-            .toLowerCase()
+    return allowed.includes(status)
+        ? status
         : "pending";
 
 }
@@ -5962,32 +4548,27 @@ function safePriority(priority) {
     const allowed = [
 
         "low",
-
         "medium",
-
         "high",
-
         "urgent"
 
     ];
 
 
-    return allowed.includes(
-        String(priority)
-            .toLowerCase()
-    )
-        ? String(priority)
-            .toLowerCase()
+    return allowed.includes(priority)
+        ? priority
         : "medium";
 
 }
 
 
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
 function escapeHTML(value) {
 
-    return String(
-        value ?? ""
-    )
+    return String(value ?? "")
         .replace(
             /&/g,
             "&amp;"
@@ -6026,27 +4607,46 @@ function renderAll() {
 
     updateTaskStats();
 
+
+    displayJobs();
+
+    displayClients();
+
+
+    /*
+       Team and Tasks are still rendered internally,
+       but unauthorized users cannot navigate to them.
+    */
+
+    if (canManageTeam()) {
+
+        displayTeamMembers();
+
+    }
+
+
+    if (canManageTasks()) {
+
+        displayTasks();
+
+    }
+
+
     populateTaskProjectOptions();
 
     populateTaskMemberOptions();
 
     populateTaskMemberFilter();
 
-    displayJobs(jobs);
-
-    displayClients(clients);
-
-    displayTeamMembers(
-        teamMembers
-    );
 
     displayPayments();
 
     displayDeadlines();
 
-    displayTasks(tasks);
-
     renderDashboard();
+
+
+    updatePermissionUI();
 
 }
 
@@ -6057,44 +4657,63 @@ function renderAll() {
 
 function initialize() {
 
+    /*
+       Set current date.
+    */
+
     updateCurrentDate();
 
 
+    /*
+       Load saved theme.
+    */
+
     const savedTheme =
         localStorage.getItem(
-            "jobTrackTheme"
+            STORAGE_KEYS.theme
         );
 
 
-    if (
-        savedTheme ===
-        "dark"
-    ) {
+    setTheme(
+        savedTheme || "dark"
+    );
 
-        setTheme("dark");
 
-    } else {
+    /*
+       Apply permission restrictions.
+    */
 
-        setTheme("light");
+    updatePermissionUI();
 
-    }
 
+    /*
+       Render application.
+    */
 
     renderAll();
+
+
+    /*
+       Load requested section.
+    */
 
     loadHashSection();
 
 }
 
 
-initialize();
-
-
 /* =========================================================
-   UPDATE DATE
+   UPDATE DATE EVERY MINUTE
 ========================================================= */
 
 setInterval(
     updateCurrentDate,
     60000
 );
+
+
+/* =========================================================
+   START APP
+========================================================= */
+
+initialize();
