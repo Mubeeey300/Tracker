@@ -4717,3 +4717,78 @@ setInterval(
 ========================================================= */
 
 initialize();
+
+
+/* =========================================================
+   COPY WALLET ADDRESS
+========================================================= */
+
+function copyWalletAddress(button) {
+    const address = button.dataset.address;
+
+    if (!address) {
+        console.error("Wallet address not found.");
+        return;
+    }
+
+    navigator.clipboard.writeText(address)
+        .then(() => {
+            const originalHTML = button.innerHTML;
+
+            button.innerHTML = `
+                <i class="bi bi-check2"></i>
+                Copied
+            `;
+
+            button.classList.add("copied");
+
+            setTimeout(() => {
+                button.innerHTML = originalHTML;
+                button.classList.remove("copied");
+            }, 1500);
+        })
+        .catch(error => {
+            console.error("Failed to copy address:", error);
+
+            // Fallback for browsers where Clipboard API is unavailable
+            const textarea = document.createElement("textarea");
+
+            textarea.value = address;
+            textarea.style.position = "fixed";
+            textarea.style.opacity = "0";
+
+            document.body.appendChild(textarea);
+            textarea.select();
+
+            try {
+                document.execCommand("copy");
+
+                const originalHTML = button.innerHTML;
+
+                button.innerHTML = `
+                    <i class="bi bi-check2"></i>
+                    Copied
+                `;
+
+                setTimeout(() => {
+                    button.innerHTML = originalHTML;
+                }, 1500);
+            } catch (err) {
+                alert("Unable to copy the address.");
+            }
+
+            textarea.remove();
+        });
+}
+
+
+/* Attach copy buttons */
+
+document.querySelectorAll(".copy-address").forEach(button => {
+    button.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        copyWalletAddress(this);
+    });
+});
