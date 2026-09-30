@@ -1,3 +1,8 @@
+/* =========================================================
+   JOBTRACK
+   COMPLETE APPLICATION JAVASCRIPT
+========================================================= */
+
 
 /* =========================================================
    DEFAULT DATA
@@ -79,6 +84,17 @@ const defaultClients = [
 ];
 
 
+/*
+ * We intentionally start Team and Tasks empty.
+ * You can add your real team members and tasks
+ * through the application.
+ */
+
+const defaultTeamMembers = [];
+
+const defaultTasks = [];
+
+
 /* =========================================================
    LOCAL STORAGE
 ========================================================= */
@@ -93,18 +109,30 @@ let clients = loadStorage(
     defaultClients
 );
 
+let teamMembers = loadStorage(
+    "jobTrackTeam",
+    defaultTeamMembers
+);
+
+let tasks = loadStorage(
+    "jobTrackTasks",
+    defaultTasks
+);
+
 
 function loadStorage(key, fallback) {
 
     try {
 
-        const saved = localStorage.getItem(key);
+        const saved =
+            localStorage.getItem(key);
 
         if (!saved) {
             return fallback;
         }
 
-        const parsed = JSON.parse(saved);
+        const parsed =
+            JSON.parse(saved);
 
         return Array.isArray(parsed)
             ? parsed
@@ -118,7 +146,9 @@ function loadStorage(key, fallback) {
         );
 
         return fallback;
+
     }
+
 }
 
 
@@ -128,6 +158,7 @@ function saveJobs() {
         "jobTrackJobs",
         JSON.stringify(jobs)
     );
+
 }
 
 
@@ -137,6 +168,27 @@ function saveClients() {
         "jobTrackClients",
         JSON.stringify(clients)
     );
+
+}
+
+
+function saveTeamMembers() {
+
+    localStorage.setItem(
+        "jobTrackTeam",
+        JSON.stringify(teamMembers)
+    );
+
+}
+
+
+function saveTasks() {
+
+    localStorage.setItem(
+        "jobTrackTasks",
+        JSON.stringify(tasks)
+    );
+
 }
 
 
@@ -144,206 +196,307 @@ function saveClients() {
    DOM
 ========================================================= */
 
-const pageTitle = document.getElementById("pageTitle");
+const pageTitle =
+    document.getElementById("pageTitle");
 
-const pageSections = document.querySelectorAll(
-    ".page-section"
-);
+const pageSections =
+    document.querySelectorAll(".page-section");
 
-const navLinks = document.querySelectorAll(
-    ".nav-link[data-section]"
-);
+const navLinks =
+    document.querySelectorAll(
+        ".nav-link[data-section]"
+    );
 
-
-const currentDate = document.getElementById(
-    "currentDate"
-);
-
-
-/* Dashboard */
-
-const totalJobs = document.getElementById(
-    "totalJobs"
-);
-
-const completedJobs = document.getElementById(
-    "completedJobs"
-);
-
-const outstandingAmount = document.getElementById(
-    "outstandingAmount"
-);
-
-const totalPaid = document.getElementById(
-    "totalPaid"
-);
-
-const recentProjects = document.getElementById(
-    "recentProjects"
-);
-
-const dashboardClients = document.getElementById(
-    "dashboardClients"
-);
-
-
-/* Projects */
-
-const jobsGrid = document.getElementById(
-    "jobsGrid"
-);
-
-const emptyJobs = document.getElementById(
-    "emptyJobs"
-);
-
-const jobSearch = document.getElementById(
-    "jobSearch"
-);
-
-const statusFilter = document.getElementById(
-    "statusFilter"
-);
-
-const paymentFilter = document.getElementById(
-    "paymentFilter"
-);
-
-
-/* Clients */
-
-const clientsGrid = document.getElementById(
-    "clientsGrid"
-);
-
-const emptyClients = document.getElementById(
-    "emptyClients"
-);
-
-const clientSearch = document.getElementById(
-    "clientSearch"
-);
-
-const totalClients = document.getElementById(
-    "totalClients"
-);
-
-const activeClients = document.getElementById(
-    "activeClients"
-);
-
-const completedClients = document.getElementById(
-    "completedClients"
-);
-
-
-/* Payments */
-
-const totalProjectValue = document.getElementById(
-    "totalProjectValue"
-);
-
-const paymentTotalPaid = document.getElementById(
-    "paymentTotalPaid"
-);
-
-const paymentOutstanding = document.getElementById(
-    "paymentOutstanding"
-);
-
-const paymentList = document.getElementById(
-    "paymentList"
-);
-
-
-/* Calendar */
-
-const deadlineList = document.getElementById(
-    "deadlineList"
-);
-
-
-/* Theme */
-
-const themeToggle = document.getElementById(
-    "themeToggle"
-);
-
-const topThemeToggle = document.getElementById(
-    "topThemeToggle"
-);
-
-const settingsThemeToggle = document.getElementById(
-    "settingsThemeToggle"
-);
-
-
-/* Mobile */
-
-const mobileMenuBtn = document.getElementById(
-    "mobileMenuBtn"
-);
-
-const sidebar = document.getElementById(
-    "sidebar"
-);
-
-const sidebarOverlay = document.getElementById(
-    "sidebarOverlay"
-);
+const currentDate =
+    document.getElementById("currentDate");
 
 
 /* =========================================================
-   MODAL DOM
+   DASHBOARD DOM
 ========================================================= */
 
-const jobModal = document.getElementById(
-    "jobModal"
-);
+const totalJobs =
+    document.getElementById("totalJobs");
 
-const jobForm = document.getElementById(
-    "jobForm"
-);
+const completedJobs =
+    document.getElementById("completedJobs");
 
-const jobModalTitle = document.getElementById(
-    "jobModalTitle"
-);
+const outstandingAmount =
+    document.getElementById("outstandingAmount");
 
-const jobId = document.getElementById(
-    "jobId"
-);
+const totalPaid =
+    document.getElementById("totalPaid");
 
-const jobName = document.getElementById(
-    "jobName"
-);
+const recentProjects =
+    document.getElementById("recentProjects");
 
-const jobClient = document.getElementById(
-    "jobClient"
-);
+const dashboardClients =
+    document.getElementById("dashboardClients");
 
-const jobBudget = document.getElementById(
-    "jobBudget"
-);
+const dashboardTeamCount =
+    document.getElementById(
+        "dashboardTeamCount"
+    );
 
-const jobPaid = document.getElementById(
-    "jobPaid"
-);
+const dashboardTaskCount =
+    document.getElementById(
+        "dashboardTaskCount"
+    );
 
-const jobDeadline = document.getElementById(
-    "jobDeadline"
-);
+const dashboardActiveTasks =
+    document.getElementById(
+        "dashboardActiveTasks"
+    );
 
-const jobStatus = document.getElementById(
-    "jobStatus"
-);
+const dashboardCompletedTasks =
+    document.getElementById(
+        "dashboardCompletedTasks"
+    );
 
-const jobProgress = document.getElementById(
-    "jobProgress"
-);
+const dashboardTasks =
+    document.getElementById(
+        "dashboardTasks"
+    );
 
-const progressValue = document.getElementById(
-    "progressValue"
-);
+
+/* =========================================================
+   PROJECT DOM
+========================================================= */
+
+const jobsGrid =
+    document.getElementById("jobsGrid");
+
+const emptyJobs =
+    document.getElementById("emptyJobs");
+
+const jobSearch =
+    document.getElementById("jobSearch");
+
+const statusFilter =
+    document.getElementById("statusFilter");
+
+const paymentFilter =
+    document.getElementById("paymentFilter");
+
+
+/* =========================================================
+   CLIENT DOM
+========================================================= */
+
+const clientsGrid =
+    document.getElementById("clientsGrid");
+
+const emptyClients =
+    document.getElementById("emptyClients");
+
+const clientSearch =
+    document.getElementById("clientSearch");
+
+const totalClients =
+    document.getElementById("totalClients");
+
+const activeClients =
+    document.getElementById("activeClients");
+
+const completedClients =
+    document.getElementById("completedClients");
+
+
+/* =========================================================
+   TEAM DOM
+========================================================= */
+
+const teamGrid =
+    document.getElementById("teamGrid");
+
+const emptyTeam =
+    document.getElementById("emptyTeam");
+
+const teamSearch =
+    document.getElementById("teamSearch");
+
+const totalTeamMembers =
+    document.getElementById(
+        "totalTeamMembers"
+    );
+
+const activeTeamMembers =
+    document.getElementById(
+        "activeTeamMembers"
+    );
+
+const assignedTeamTasks =
+    document.getElementById(
+        "assignedTeamTasks"
+    );
+
+const teamCompletedTasks =
+    document.getElementById(
+        "teamCompletedTasks"
+    );
+
+
+/* =========================================================
+   TASK DOM
+========================================================= */
+
+const tasksGrid =
+    document.getElementById("tasksGrid");
+
+const emptyTasks =
+    document.getElementById("emptyTasks");
+
+const taskSearch =
+    document.getElementById("taskSearch");
+
+const taskStatusFilter =
+    document.getElementById(
+        "taskStatusFilter"
+    );
+
+const taskPriorityFilter =
+    document.getElementById(
+        "taskPriorityFilter"
+    );
+
+const taskMemberFilter =
+    document.getElementById(
+        "taskMemberFilter"
+    );
+
+const totalTasks =
+    document.getElementById("totalTasks");
+
+const inProgressTasks =
+    document.getElementById(
+        "inProgressTasks"
+    );
+
+const pendingTasks =
+    document.getElementById(
+        "pendingTasks"
+    );
+
+const completedTasks =
+    document.getElementById(
+        "completedTasks"
+    );
+
+
+/* =========================================================
+   PAYMENT DOM
+========================================================= */
+
+const totalProjectValue =
+    document.getElementById(
+        "totalProjectValue"
+    );
+
+const paymentTotalPaid =
+    document.getElementById(
+        "paymentTotalPaid"
+    );
+
+const paymentOutstanding =
+    document.getElementById(
+        "paymentOutstanding"
+    );
+
+const paymentList =
+    document.getElementById("paymentList");
+
+
+/* =========================================================
+   CALENDAR DOM
+========================================================= */
+
+const deadlineList =
+    document.getElementById("deadlineList");
+
+
+/* =========================================================
+   THEME DOM
+========================================================= */
+
+const themeToggle =
+    document.getElementById("themeToggle");
+
+const topThemeToggle =
+    document.getElementById(
+        "topThemeToggle"
+    );
+
+const settingsThemeToggle =
+    document.getElementById(
+        "settingsThemeToggle"
+    );
+
+
+/* =========================================================
+   MOBILE DOM
+========================================================= */
+
+const mobileMenuBtn =
+    document.getElementById(
+        "mobileMenuBtn"
+    );
+
+const sidebar =
+    document.getElementById("sidebar");
+
+const sidebarOverlay =
+    document.getElementById(
+        "sidebarOverlay"
+    );
+
+
+/* =========================================================
+   JOB MODAL DOM
+========================================================= */
+
+const jobModal =
+    document.getElementById("jobModal");
+
+const jobForm =
+    document.getElementById("jobForm");
+
+const jobModalTitle =
+    document.getElementById(
+        "jobModalTitle"
+    );
+
+const jobId =
+    document.getElementById("jobId");
+
+const jobName =
+    document.getElementById("jobName");
+
+const jobClient =
+    document.getElementById("jobClient");
+
+const jobBudget =
+    document.getElementById("jobBudget");
+
+const jobPaid =
+    document.getElementById("jobPaid");
+
+const jobDeadline =
+    document.getElementById(
+        "jobDeadline"
+    );
+
+const jobStatus =
+    document.getElementById("jobStatus");
+
+const jobProgress =
+    document.getElementById(
+        "jobProgress"
+    );
+
+const progressValue =
+    document.getElementById(
+        "progressValue"
+    );
 
 const previewPaymentStatus =
     document.getElementById(
@@ -356,41 +509,169 @@ const previewRemaining =
     );
 
 
-const clientModal = document.getElementById(
-    "clientModal"
-);
+/* =========================================================
+   CLIENT MODAL DOM
+========================================================= */
 
-const clientForm = document.getElementById(
-    "clientForm"
-);
+const clientModal =
+    document.getElementById(
+        "clientModal"
+    );
 
-const clientModalTitle = document.getElementById(
-    "clientModalTitle"
-);
+const clientForm =
+    document.getElementById(
+        "clientForm"
+    );
 
-const clientId = document.getElementById(
-    "clientId"
-);
+const clientModalTitle =
+    document.getElementById(
+        "clientModalTitle"
+    );
 
-const clientName = document.getElementById(
-    "clientName"
-);
+const clientId =
+    document.getElementById(
+        "clientId"
+    );
 
-const clientEmail = document.getElementById(
-    "clientEmail"
-);
+const clientName =
+    document.getElementById(
+        "clientName"
+    );
 
-const clientPhone = document.getElementById(
-    "clientPhone"
-);
+const clientEmail =
+    document.getElementById(
+        "clientEmail"
+    );
 
-const clientCompany = document.getElementById(
-    "clientCompany"
-);
+const clientPhone =
+    document.getElementById(
+        "clientPhone"
+    );
 
-const clientNotes = document.getElementById(
-    "clientNotes"
-);
+const clientCompany =
+    document.getElementById(
+        "clientCompany"
+    );
+
+const clientNotes =
+    document.getElementById(
+        "clientNotes"
+    );
+
+
+/* =========================================================
+   TEAM MODAL DOM
+========================================================= */
+
+const memberModal =
+    document.getElementById(
+        "memberModal"
+    );
+
+const memberForm =
+    document.getElementById(
+        "memberForm"
+    );
+
+const memberModalTitle =
+    document.getElementById(
+        "memberModalTitle"
+    );
+
+const memberId =
+    document.getElementById(
+        "memberId"
+    );
+
+const memberName =
+    document.getElementById(
+        "memberName"
+    );
+
+const memberRole =
+    document.getElementById(
+        "memberRole"
+    );
+
+const memberEmail =
+    document.getElementById(
+        "memberEmail"
+    );
+
+const memberStatus =
+    document.getElementById(
+        "memberStatus"
+    );
+
+const memberNotes =
+    document.getElementById(
+        "memberNotes"
+    );
+
+
+/* =========================================================
+   TASK MODAL DOM
+========================================================= */
+
+const taskModal =
+    document.getElementById(
+        "taskModal"
+    );
+
+const taskForm =
+    document.getElementById(
+        "taskForm"
+    );
+
+const taskModalTitle =
+    document.getElementById(
+        "taskModalTitle"
+    );
+
+const taskId =
+    document.getElementById(
+        "taskId"
+    );
+
+const taskTitle =
+    document.getElementById(
+        "taskTitle"
+    );
+
+const taskDescription =
+    document.getElementById(
+        "taskDescription"
+    );
+
+const taskProject =
+    document.getElementById(
+        "taskProject"
+    );
+
+const taskAssignee =
+    document.getElementById(
+        "taskAssignee"
+    );
+
+const taskPriority =
+    document.getElementById(
+        "taskPriority"
+    );
+
+const taskDueDate =
+    document.getElementById(
+        "taskDueDate"
+    );
+
+const taskStatus =
+    document.getElementById(
+        "taskStatus"
+    );
+
+const taskNotes =
+    document.getElementById(
+        "taskNotes"
+    );
 
 
 /* =========================================================
@@ -403,10 +684,8 @@ function updateCurrentDate() {
         return;
     }
 
-    const now = new Date();
-
     currentDate.textContent =
-        now.toLocaleDateString(
+        new Date().toLocaleDateString(
             "en-NG",
             {
                 weekday: "short",
@@ -415,6 +694,7 @@ function updateCurrentDate() {
                 year: "numeric"
             }
         );
+
 }
 
 
@@ -427,6 +707,10 @@ const sectionTitles = {
     dashboard: "Dashboard",
 
     projects: "Projects",
+
+    tasks: "Tasks",
+
+    team: "Team",
 
     clients: "Clients",
 
@@ -442,7 +726,10 @@ const sectionTitles = {
 function showSection(sectionName) {
 
     if (!document.getElementById(sectionName)) {
-        sectionName = "dashboard";
+
+        sectionName =
+            "dashboard";
+
     }
 
 
@@ -460,40 +747,84 @@ function showSection(sectionName) {
 
         link.classList.toggle(
             "active",
-            link.dataset.section === sectionName
+            link.dataset.section ===
+            sectionName
         );
 
     });
 
 
-    pageTitle.textContent =
-        sectionTitles[sectionName] ||
-        "Dashboard";
+    if (pageTitle) {
 
+        pageTitle.textContent =
+            sectionTitles[
+                sectionName
+            ] || "Dashboard";
 
-    if (sectionName === "dashboard") {
-        renderDashboard();
     }
 
-    if (sectionName === "projects") {
-        filterJobs();
-    }
 
-    if (sectionName === "clients") {
-        filterClients();
-    }
+    switch (sectionName) {
 
-    if (sectionName === "payments") {
-        displayPayments();
-    }
+        case "dashboard":
 
-    if (sectionName === "calendar") {
-        displayDeadlines();
+            renderDashboard();
+
+            break;
+
+
+        case "projects":
+
+            filterJobs();
+
+            break;
+
+
+        case "tasks":
+
+            populateTaskProjectOptions();
+
+            populateTaskMemberOptions();
+
+            filterTasks();
+
+            break;
+
+
+        case "team":
+
+            filterTeamMembers();
+
+            break;
+
+
+        case "clients":
+
+            filterClients();
+
+            break;
+
+
+        case "payments":
+
+            displayPayments();
+
+            break;
+
+
+        case "calendar":
+
+            displayDeadlines();
+
+            break;
+
     }
 
 
     if (window.innerWidth <= 800) {
+
         closeMobileSidebar();
+
     }
 
 
@@ -507,7 +838,9 @@ function showSection(sectionName) {
             "",
             `#${sectionName}`
         );
+
     }
+
 }
 
 
@@ -530,7 +863,9 @@ navLinks.forEach(link => {
 
 
 document
-    .querySelectorAll("[data-section-link]")
+    .querySelectorAll(
+        "[data-section-link]"
+    )
     .forEach(button => {
 
         button.addEventListener(
@@ -550,7 +885,11 @@ document
 function loadHashSection() {
 
     const section =
-        window.location.hash.replace("#", "");
+        window.location.hash.replace(
+            "#",
+            ""
+        );
+
 
     if (section) {
 
@@ -561,28 +900,44 @@ function loadHashSection() {
         showSection("dashboard");
 
     }
+
 }
 
 
+window.addEventListener(
+    "hashchange",
+    loadHashSection
+);
+
+
 /* =========================================================
-   JOBS
+   PROJECTS
 ========================================================= */
 
 function displayJobs(jobList) {
+
+    if (!jobsGrid) {
+        return;
+    }
+
 
     jobsGrid.innerHTML = "";
 
 
     if (!jobList.length) {
 
-        emptyJobs.classList.remove("hidden");
+        emptyJobs.classList.remove(
+            "hidden"
+        );
 
         return;
 
     }
 
 
-    emptyJobs.classList.add("hidden");
+    emptyJobs.classList.add(
+        "hidden"
+    );
 
 
     jobList.forEach(job => {
@@ -613,8 +968,10 @@ function displayJobs(jobList) {
 
 
         const status =
-            String(job.status || "pending")
-                .toLowerCase();
+            String(
+                job.status ||
+                "pending"
+            ).toLowerCase();
 
 
         const paymentStatus =
@@ -625,10 +982,13 @@ function displayJobs(jobList) {
 
 
         const card =
-            document.createElement("article");
+            document.createElement(
+                "article"
+            );
 
 
-        card.className = "job-card";
+        card.className =
+            "job-card";
 
 
         card.innerHTML = `
@@ -639,33 +999,38 @@ function displayJobs(jobList) {
 
                     <div class="job-icon">
 
-                        <i class="bi ${
-                            escapeHTML(
-                                job.icon ||
-                                "bi-folder"
-                            )
-                        }"></i>
+                        <i class="bi ${safeIcon(
+                            job.icon
+                        )}"></i>
 
                     </div>
-
 
                     <div class="job-card-title">
 
                         <h3>
-                            ${escapeHTML(job.name)}
+                            ${escapeHTML(
+                                job.name
+                            )}
                         </h3>
 
                         <div class="client-name">
-                            ${escapeHTML(job.client)}
+                            ${escapeHTML(
+                                job.client
+                            )}
                         </div>
 
                     </div>
 
                 </div>
 
+                <span class="status status-${safeStatus(
+                    status
+                )}">
 
-                <span class="status status-${status}">
-                    ${capitalize(status)}
+                    ${capitalize(
+                        status
+                    )}
+
                 </span>
 
             </div>
@@ -680,7 +1045,9 @@ function displayJobs(jobList) {
                     </span>
 
                     <strong>
-                        ${formatMoney(budget)}
+                        ${formatMoney(
+                            budget
+                        )}
                     </strong>
 
                 </div>
@@ -693,7 +1060,11 @@ function displayJobs(jobList) {
                     </span>
 
                     <strong class="payment-paid">
-                        ${formatMoney(paid)}
+
+                        ${formatMoney(
+                            paid
+                        )}
+
                     </strong>
 
                 </div>
@@ -714,7 +1085,6 @@ function displayJobs(jobList) {
                     </strong>
 
                 </div>
-
 
                 <div class="progress-bar">
 
@@ -749,13 +1119,15 @@ function displayJobs(jobList) {
                         Remaining
                     </span>
 
-                    <strong class="payment-balance ${
+                    <strong class="${
                         balance > 0
                             ? "payment-due"
                             : "payment-paid"
                     }">
 
-                        ${formatMoney(balance)}
+                        ${formatMoney(
+                            balance
+                        )}
 
                     </strong>
 
@@ -770,7 +1142,9 @@ function displayJobs(jobList) {
 
                     <i class="bi bi-calendar3"></i>
 
-                    ${formatDate(job.deadline)}
+                    ${formatDate(
+                        job.deadline
+                    )}
 
                 </div>
 
@@ -783,7 +1157,9 @@ function displayJobs(jobList) {
                         data-id="${job.id}"
                         title="Edit"
                     >
+
                         <i class="bi bi-pencil"></i>
+
                     </button>
 
 
@@ -793,7 +1169,9 @@ function displayJobs(jobList) {
                         data-id="${job.id}"
                         title="Delete"
                     >
+
                         <i class="bi bi-trash"></i>
+
                     </button>
 
                 </div>
@@ -809,6 +1187,7 @@ function displayJobs(jobList) {
 
 
     attachJobActions();
+
 }
 
 
@@ -823,7 +1202,9 @@ function attachJobActions() {
                 () => {
 
                     editJob(
-                        Number(button.dataset.id)
+                        Number(
+                            button.dataset.id
+                        )
                     );
 
                 }
@@ -841,7 +1222,9 @@ function attachJobActions() {
                 () => {
 
                     deleteJob(
-                        Number(button.dataset.id)
+                        Number(
+                            button.dataset.id
+                        )
                     );
 
                 }
@@ -858,18 +1241,28 @@ function getPaymentStatus(
 ) {
 
     if (budget <= 0) {
+
         return "Payment Pending";
+
     }
+
 
     if (paid >= budget) {
+
         return "Fully Paid";
+
     }
+
 
     if (paid > 0) {
+
         return "Partially Paid";
+
     }
 
+
     return "Payment Pending";
+
 }
 
 
@@ -877,6 +1270,7 @@ function updateStats() {
 
     const total =
         jobs.length;
+
 
     const completed =
         jobs.filter(
@@ -904,49 +1298,81 @@ function updateStats() {
             (sum, job) =>
                 sum +
                 Math.max(
-                    (Number(job.budget) || 0) -
-                    (Number(job.paid) || 0),
+                    Number(job.budget) || 0 -
+                    Number(job.paid) || 0,
                     0
                 ),
             0
         );
 
 
-    totalJobs.textContent =
-        total;
+    if (totalJobs) {
+        totalJobs.textContent = total;
+    }
 
-    completedJobs.textContent =
-        completed;
+    if (completedJobs) {
+        completedJobs.textContent =
+            completed;
+    }
 
-    totalPaid.textContent =
-        formatMoney(paid);
+    if (totalPaid) {
+        totalPaid.textContent =
+            formatMoney(paid);
+    }
 
-    outstandingAmount.textContent =
-        formatMoney(outstanding);
-
-
-    totalProjectValue.textContent =
-        formatMoney(
-            jobs.reduce(
-                (sum, job) =>
-                    sum +
-                    (Number(job.budget) || 0),
-                0
-            )
-        );
+    if (outstandingAmount) {
+        outstandingAmount.textContent =
+            formatMoney(
+                outstanding
+            );
+    }
 
 
-    paymentTotalPaid.textContent =
-        formatMoney(paid);
+    if (totalProjectValue) {
+
+        totalProjectValue.textContent =
+            formatMoney(
+                jobs.reduce(
+                    (sum, job) =>
+                        sum +
+                        (
+                            Number(
+                                job.budget
+                            ) || 0
+                        ),
+                    0
+                )
+            );
+
+    }
 
 
-    paymentOutstanding.textContent =
-        formatMoney(outstanding);
+    if (paymentTotalPaid) {
+
+        paymentTotalPaid.textContent =
+            formatMoney(paid);
+
+    }
+
+
+    if (paymentOutstanding) {
+
+        paymentOutstanding.textContent =
+            formatMoney(
+                outstanding
+            );
+
+    }
 
 }
 
 
 function filterJobs() {
+
+    if (!jobSearch) {
+        return;
+    }
+
 
     const search =
         jobSearch.value
@@ -981,11 +1407,14 @@ function filterJobs() {
             const matchesStatus =
 
                 status === "all" ||
+
                 String(job.status)
-                    .toLowerCase() === status;
+                    .toLowerCase() ===
+                status;
 
 
-            let matchesPayment = true;
+            let matchesPayment =
+                true;
 
 
             if (payment !== "all") {
@@ -1056,9 +1485,7 @@ function openAddModal() {
     progressValue.textContent =
         "0%";
 
-
     updatePaymentPreview();
-
 
     openModal(jobModal);
 
@@ -1069,7 +1496,9 @@ function editJob(id) {
 
     const job =
         jobs.find(
-            item => Number(item.id) === Number(id)
+            item =>
+                Number(item.id) ===
+                Number(id)
         );
 
 
@@ -1106,13 +1535,10 @@ function editJob(id) {
     jobProgress.value =
         job.progress ?? 0;
 
-
     progressValue.textContent =
         `${job.progress ?? 0}%`;
 
-
     updatePaymentPreview();
-
 
     openModal(jobModal);
 
@@ -1123,7 +1549,9 @@ function deleteJob(id) {
 
     const job =
         jobs.find(
-            item => Number(item.id) === Number(id)
+            item =>
+                Number(item.id) ===
+                Number(id)
         );
 
 
@@ -1132,21 +1560,73 @@ function deleteJob(id) {
     }
 
 
-    const confirmed =
-        window.confirm(
-            `Delete "${job.name}"?`
+    const attachedTasks =
+        tasks.filter(
+            task =>
+                Number(task.projectId) ===
+                Number(id)
         );
 
 
-    if (!confirmed) {
-        return;
+    if (attachedTasks.length) {
+
+        const confirmed =
+            window.confirm(
+                `"${job.name}" has ${attachedTasks.length} attached task${
+                    attachedTasks.length === 1
+                        ? ""
+                        : "s"
+                }.\n\nDelete the project and leave those tasks without a project?`
+            );
+
+
+        if (!confirmed) {
+            return;
+        }
+
+
+        tasks =
+            tasks.map(task => {
+
+                if (
+                    Number(task.projectId) ===
+                    Number(id)
+                ) {
+
+                    return {
+                        ...task,
+                        projectId: ""
+                    };
+
+                }
+
+                return task;
+
+            });
+
+
+        saveTasks();
+
+    } else {
+
+        const confirmed =
+            window.confirm(
+                `Delete "${job.name}"?`
+            );
+
+
+        if (!confirmed) {
+            return;
+        }
+
     }
 
 
     jobs =
         jobs.filter(
             item =>
-                Number(item.id) !== Number(id)
+                Number(item.id) !==
+                Number(id)
         );
 
 
@@ -1156,6 +1636,10 @@ function deleteJob(id) {
 
 }
 
+
+/* =========================================================
+   JOB FORM
+========================================================= */
 
 jobForm.addEventListener(
     "submit",
@@ -1170,39 +1654,62 @@ jobForm.addEventListener(
         const client =
             jobClient.value.trim();
 
+        if (!name || !client) {
+            return;
+        }
+
+
         const budget =
             Math.max(
-                Number(jobBudget.value) || 0,
+                Number(
+                    jobBudget.value
+                ) || 0,
                 0
             );
+
 
         const paid =
             Math.min(
                 Math.max(
-                    Number(jobPaid.value) || 0,
+                    Number(
+                        jobPaid.value
+                    ) || 0,
                     0
                 ),
                 budget
             );
 
+
         const deadline =
             jobDeadline.value;
+
 
         const status =
             jobStatus.value;
 
+
         let progress =
-            Number(jobProgress.value) || 0;
+            Number(
+                jobProgress.value
+            ) || 0;
 
 
-        if (status === "completed") {
+        if (
+            status ===
+            "completed"
+        ) {
+
             progress = 100;
+
         }
 
 
         progress =
             Math.min(
-                Math.max(progress, 0),
+                Math.max(
+                    progress,
+                    0
+                ),
                 100
             );
 
@@ -1228,11 +1735,17 @@ jobForm.addEventListener(
                     ...jobs[index],
 
                     name,
+
                     client,
+
                     budget,
+
                     paid,
+
                     deadline,
+
                     status,
+
                     progress
 
                 };
@@ -1259,7 +1772,8 @@ jobForm.addEventListener(
 
                 progress,
 
-                icon: getRandomIcon()
+                icon:
+                    getRandomIcon()
 
             });
 
@@ -1285,11 +1799,16 @@ jobForm.addEventListener(
 function updatePaymentPreview() {
 
     const budget =
-        Number(jobBudget.value) || 0;
+        Number(
+            jobBudget.value
+        ) || 0;
+
 
     const paid =
         Math.min(
-            Number(jobPaid.value) || 0,
+            Number(
+                jobPaid.value
+            ) || 0,
             budget
         );
 
@@ -1301,15 +1820,25 @@ function updatePaymentPreview() {
         );
 
 
-    previewPaymentStatus.textContent =
-        getPaymentStatus(
-            budget,
-            paid
-        );
+    if (previewPaymentStatus) {
+
+        previewPaymentStatus.textContent =
+            getPaymentStatus(
+                budget,
+                paid
+            );
+
+    }
 
 
-    previewRemaining.textContent =
-        formatMoney(remaining);
+    if (previewRemaining) {
+
+        previewRemaining.textContent =
+            formatMoney(
+                remaining
+            );
+
+    }
 
 }
 
@@ -1396,7 +1925,9 @@ function displayClients(clientList) {
 
 
         const card =
-            document.createElement("article");
+            document.createElement(
+                "article"
+            );
 
 
         card.className =
@@ -1410,20 +1941,28 @@ function displayClients(clientList) {
                 <div class="client-card-main">
 
                     <div class="client-avatar">
-                        ${getInitials(client.name)}
+
+                        ${getInitials(
+                            client.name
+                        )}
+
                     </div>
 
                     <div>
 
                         <h3>
-                            ${escapeHTML(client.name)}
+                            ${escapeHTML(
+                                client.name
+                            )}
                         </h3>
 
                         <div class="client-company">
+
                             ${escapeHTML(
                                 client.company ||
                                 "Independent Client"
                             )}
+
                         </div>
 
                     </div>
@@ -1431,8 +1970,16 @@ function displayClients(clientList) {
                 </div>
 
 
-                <span class="status status-${client.status || "active"}">
-                    ${capitalize(client.status || "active")}
+                <span class="status status-${safeStatus(
+                    client.status ||
+                    "active"
+                )}">
+
+                    ${capitalize(
+                        client.status ||
+                        "active"
+                    )}
+
                 </span>
 
             </div>
@@ -1444,10 +1991,15 @@ function displayClients(clientList) {
                     client.email
                         ? `
                             <div>
+
                                 <i class="bi bi-envelope"></i>
+
                                 <span>
-                                    ${escapeHTML(client.email)}
+                                    ${escapeHTML(
+                                        client.email
+                                    )}
                                 </span>
+
                             </div>
                         `
                         : ""
@@ -1458,10 +2010,15 @@ function displayClients(clientList) {
                     client.phone
                         ? `
                             <div>
+
                                 <i class="bi bi-telephone"></i>
+
                                 <span>
-                                    ${escapeHTML(client.phone)}
+                                    ${escapeHTML(
+                                        client.phone
+                                    )}
                                 </span>
+
                             </div>
                         `
                         : ""
@@ -1474,7 +2031,9 @@ function displayClients(clientList) {
 
                 ${
                     client.notes
-                        ? escapeHTML(client.notes)
+                        ? escapeHTML(
+                            client.notes
+                        )
                         : "No notes added."
                 }
 
@@ -1484,12 +2043,15 @@ function displayClients(clientList) {
             <div class="client-card-footer">
 
                 <span class="client-company">
+
                     ${clientJobs.length}
+
                     ${
                         clientJobs.length === 1
                             ? " project"
                             : " projects"
                     }
+
                 </span>
 
 
@@ -1501,7 +2063,9 @@ function displayClients(clientList) {
                         data-id="${client.id}"
                         title="Edit client"
                     >
+
                         <i class="bi bi-pencil"></i>
+
                     </button>
 
 
@@ -1511,7 +2075,9 @@ function displayClients(clientList) {
                         data-id="${client.id}"
                         title="Delete client"
                     >
+
                         <i class="bi bi-trash"></i>
+
                     </button>
 
                 </div>
@@ -1534,7 +2100,9 @@ function displayClients(clientList) {
 function attachClientActions() {
 
     document
-        .querySelectorAll(".edit-client")
+        .querySelectorAll(
+            ".edit-client"
+        )
         .forEach(button => {
 
             button.addEventListener(
@@ -1542,7 +2110,9 @@ function attachClientActions() {
                 () => {
 
                     editClient(
-                        Number(button.dataset.id)
+                        Number(
+                            button.dataset.id
+                        )
                     );
 
                 }
@@ -1552,7 +2122,9 @@ function attachClientActions() {
 
 
     document
-        .querySelectorAll(".delete-client")
+        .querySelectorAll(
+            ".delete-client"
+        )
         .forEach(button => {
 
             button.addEventListener(
@@ -1560,7 +2132,9 @@ function attachClientActions() {
                 () => {
 
                     deleteClient(
-                        Number(button.dataset.id)
+                        Number(
+                            button.dataset.id
+                        )
                     );
 
                 }
@@ -1573,26 +2147,40 @@ function attachClientActions() {
 
 function updateClientStats() {
 
-    totalClients.textContent =
-        clients.length;
+    if (totalClients) {
+
+        totalClients.textContent =
+            clients.length;
+
+    }
 
 
-    activeClients.textContent =
-        clients.filter(
-            client =>
-                String(client.status)
-                    .toLowerCase() ===
-                "active"
-        ).length;
+    if (activeClients) {
+
+        activeClients.textContent =
+            clients.filter(
+                client =>
+                    String(
+                        client.status
+                    ).toLowerCase() ===
+                    "active"
+            ).length;
+
+    }
 
 
-    completedClients.textContent =
-        clients.filter(
-            client =>
-                String(client.status)
-                    .toLowerCase() ===
-                "completed"
-        ).length;
+    if (completedClients) {
+
+        completedClients.textContent =
+            clients.filter(
+                client =>
+                    String(
+                        client.status
+                    ).toLowerCase() ===
+                    "completed"
+            ).length;
+
+    }
 
 }
 
@@ -1610,19 +2198,25 @@ function filterClients() {
 
             return (
 
-                String(client.name)
+                String(
+                    client.name
+                )
                     .toLowerCase()
                     .includes(search)
 
                 ||
 
-                String(client.email)
+                String(
+                    client.email
+                )
                     .toLowerCase()
                     .includes(search)
 
                 ||
 
-                String(client.company)
+                String(
+                    client.company
+                )
                     .toLowerCase()
                     .includes(search)
 
@@ -1644,7 +2238,6 @@ function openClientModal() {
 
     clientModalTitle.textContent =
         "Add New Client";
-
 
     openModal(clientModal);
 
@@ -1712,10 +2305,12 @@ function deleteClient(id) {
     const attachedJobs =
         jobs.filter(
             job =>
-                String(job.client)
-                    .toLowerCase() ===
-                String(client.name)
-                    .toLowerCase()
+                String(
+                    job.client
+                ).toLowerCase() ===
+                String(
+                    client.name
+                ).toLowerCase()
         );
 
 
@@ -1730,6 +2325,7 @@ function deleteClient(id) {
         );
 
         return;
+
     }
 
 
@@ -1747,7 +2343,8 @@ function deleteClient(id) {
     clients =
         clients.filter(
             item =>
-                Number(item.id) !== Number(id)
+                Number(item.id) !==
+                Number(id)
         );
 
 
@@ -1815,24 +2412,24 @@ clientForm.addEventListener(
                 };
 
 
-                /*
-                 * Keep projects connected when
-                 * a client changes their name.
-                 */
-
                 jobs =
                     jobs.map(job => {
 
                         if (
-                            String(job.client)
-                                .toLowerCase() ===
-                            String(oldName)
-                                .toLowerCase()
+                            String(
+                                job.client
+                            ).toLowerCase() ===
+                            String(
+                                oldName
+                            ).toLowerCase()
                         ) {
 
                             return {
+
                                 ...job,
+
                                 client: name
+
                             };
 
                         }
@@ -1866,7 +2463,8 @@ clientForm.addEventListener(
                 notes:
                     clientNotes.value.trim(),
 
-                status: "active"
+                status:
+                    "active"
 
             });
 
@@ -1886,6 +2484,1826 @@ clientForm.addEventListener(
 
 
 /* =========================================================
+   TEAM
+========================================================= */
+
+function updateTeamStats() {
+
+    const active =
+        teamMembers.filter(
+            member =>
+                String(
+                    member.status
+                ).toLowerCase() ===
+                "active"
+        ).length;
+
+
+    const assigned =
+        tasks.filter(
+            task =>
+                task.assigneeId !==
+                "" &&
+                task.assigneeId !==
+                null &&
+                task.assigneeId !==
+                undefined
+        ).length;
+
+
+    const completed =
+        tasks.filter(
+            task =>
+                String(
+                    task.status
+                ).toLowerCase() ===
+                "completed"
+        ).length;
+
+
+    if (totalTeamMembers) {
+
+        totalTeamMembers.textContent =
+            teamMembers.length;
+
+    }
+
+
+    if (activeTeamMembers) {
+
+        activeTeamMembers.textContent =
+            active;
+
+    }
+
+
+    if (assignedTeamTasks) {
+
+        assignedTeamTasks.textContent =
+            assigned;
+
+    }
+
+
+    if (teamCompletedTasks) {
+
+        teamCompletedTasks.textContent =
+            completed;
+
+    }
+
+
+    if (dashboardTeamCount) {
+
+        dashboardTeamCount.textContent =
+            teamMembers.length;
+
+    }
+
+}
+
+
+function displayTeamMembers(
+    memberList
+) {
+
+    if (!teamGrid) {
+        return;
+    }
+
+
+    teamGrid.innerHTML = "";
+
+
+    if (!memberList.length) {
+
+        emptyTeam.classList.remove(
+            "hidden"
+        );
+
+        return;
+
+    }
+
+
+    emptyTeam.classList.add(
+        "hidden"
+    );
+
+
+    memberList.forEach(member => {
+
+        const memberTasks =
+            tasks.filter(
+                task =>
+                    Number(
+                        task.assigneeId
+                    ) ===
+                    Number(
+                        member.id
+                    )
+            );
+
+
+        const completed =
+            memberTasks.filter(
+                task =>
+                    String(
+                        task.status
+                    ).toLowerCase() ===
+                    "completed"
+            ).length;
+
+
+        const status =
+            String(
+                member.status ||
+                "active"
+            ).toLowerCase();
+
+
+        const card =
+            document.createElement(
+                "article"
+            );
+
+
+        card.className =
+            "team-card";
+
+
+        card.innerHTML = `
+
+            <div class="team-card-header">
+
+                <div class="team-member-info">
+
+                    <div class="team-avatar">
+
+                        ${getInitials(
+                            member.name
+                        )}
+
+                    </div>
+
+
+                    <div>
+
+                        <h3>
+                            ${escapeHTML(
+                                member.name
+                            )}
+                        </h3>
+
+                        <span>
+
+                            ${escapeHTML(
+                                member.email ||
+                                "No email"
+                            )}
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <span class="team-role">
+
+                    ${escapeHTML(
+                        member.role ||
+                        "Team Member"
+                    )}
+
+                </span>
+
+            </div>
+
+
+            <div class="team-card-body">
+
+                <div class="team-card-row">
+
+                    <span>
+                        Status
+                    </span>
+
+                    <strong
+                        class="team-status ${
+                            status ===
+                            "active"
+                                ? ""
+                                : "inactive"
+                        }"
+                    >
+
+                        ${capitalize(
+                            status
+                        )}
+
+                    </strong>
+
+                </div>
+
+
+                <div class="team-card-row">
+
+                    <span>
+                        Assigned Tasks
+                    </span>
+
+                    <strong>
+                        ${memberTasks.length}
+                    </strong>
+
+                </div>
+
+
+                <div class="team-card-row">
+
+                    <span>
+                        Completed
+                    </span>
+
+                    <strong>
+                        ${completed}
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            ${
+                member.notes
+                    ? `
+                        <p class="client-notes">
+
+                            ${escapeHTML(
+                                member.notes
+                            )}
+
+                        </p>
+                    `
+                    : ""
+            }
+
+
+            <div class="team-card-footer">
+
+                <span class="team-card-email">
+
+                    ${escapeHTML(
+                        member.email ||
+                        "No email provided"
+                    )}
+
+                </span>
+
+
+                <div class="team-card-actions">
+
+                    <button
+                        type="button"
+                        class="card-btn edit-member"
+                        data-id="${member.id}"
+                        title="Edit member"
+                    >
+
+                        <i class="bi bi-pencil"></i>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="card-btn delete delete-member"
+                        data-id="${member.id}"
+                        title="Delete member"
+                    >
+
+                        <i class="bi bi-trash"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        `;
+
+
+        teamGrid.appendChild(card);
+
+    });
+
+
+    attachTeamActions();
+
+}
+
+
+function attachTeamActions() {
+
+    document
+        .querySelectorAll(
+            ".edit-member"
+        )
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    editTeamMember(
+                        Number(
+                            button.dataset.id
+                        )
+                    );
+
+                }
+            );
+
+        });
+
+
+    document
+        .querySelectorAll(
+            ".delete-member"
+        )
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    deleteTeamMember(
+                        Number(
+                            button.dataset.id
+                        )
+                    );
+
+                }
+            );
+
+        });
+
+}
+
+
+function filterTeamMembers() {
+
+    const search =
+        teamSearch.value
+            .trim()
+            .toLowerCase();
+
+
+    const filtered =
+        teamMembers.filter(
+            member => {
+
+                return (
+
+                    String(
+                        member.name
+                    )
+                        .toLowerCase()
+                        .includes(search)
+
+                    ||
+
+                    String(
+                        member.role
+                    )
+                        .toLowerCase()
+                        .includes(search)
+
+                    ||
+
+                    String(
+                        member.email
+                    )
+                        .toLowerCase()
+                        .includes(search)
+
+                );
+
+            }
+        );
+
+
+    displayTeamMembers(
+        filtered
+    );
+
+    updateTeamStats();
+
+}
+
+
+function openMemberModal() {
+
+    memberForm.reset();
+
+    memberId.value = "";
+
+    memberModalTitle.textContent =
+        "Add Team Member";
+
+    openModal(memberModal);
+
+}
+
+
+function editTeamMember(id) {
+
+    const member =
+        teamMembers.find(
+            item =>
+                Number(item.id) ===
+                Number(id)
+        );
+
+
+    if (!member) {
+        return;
+    }
+
+
+    memberModalTitle.textContent =
+        "Edit Team Member";
+
+
+    memberId.value =
+        member.id;
+
+    memberName.value =
+        member.name || "";
+
+    memberRole.value =
+        member.role || "";
+
+    memberEmail.value =
+        member.email || "";
+
+    memberStatus.value =
+        member.status ||
+        "active";
+
+    memberNotes.value =
+        member.notes || "";
+
+
+    openModal(memberModal);
+
+}
+
+
+function deleteTeamMember(id) {
+
+    const member =
+        teamMembers.find(
+            item =>
+                Number(item.id) ===
+                Number(id)
+        );
+
+
+    if (!member) {
+        return;
+    }
+
+
+    const assignedTasks =
+        tasks.filter(
+            task =>
+                Number(
+                    task.assigneeId
+                ) ===
+                Number(id)
+        );
+
+
+    if (assignedTasks.length) {
+
+        const confirmed =
+            window.confirm(
+                `${member.name} has ${assignedTasks.length} assigned task${
+                    assignedTasks.length === 1
+                        ? ""
+                        : "s"
+                }.\n\nDelete the member and leave those tasks unassigned?`
+            );
+
+
+        if (!confirmed) {
+            return;
+        }
+
+
+        tasks =
+            tasks.map(task => {
+
+                if (
+                    Number(
+                        task.assigneeId
+                    ) ===
+                    Number(id)
+                ) {
+
+                    return {
+
+                        ...task,
+
+                        assigneeId: ""
+
+                    };
+
+                }
+
+                return task;
+
+            });
+
+
+        saveTasks();
+
+    } else {
+
+        const confirmed =
+            window.confirm(
+                `Delete team member "${member.name}"?`
+            );
+
+
+        if (!confirmed) {
+            return;
+        }
+
+    }
+
+
+    teamMembers =
+        teamMembers.filter(
+            item =>
+                Number(item.id) !==
+                Number(id)
+        );
+
+
+    saveTeamMembers();
+
+    renderAll();
+
+}
+
+
+memberForm.addEventListener(
+    "submit",
+    event => {
+
+        event.preventDefault();
+
+
+        const name =
+            memberName.value.trim();
+
+
+        if (!name) {
+            return;
+        }
+
+
+        const existingId =
+            memberId.value;
+
+
+        const data = {
+
+            name,
+
+            role:
+                memberRole.value.trim(),
+
+            email:
+                memberEmail.value.trim(),
+
+            status:
+                memberStatus.value ||
+                "active",
+
+            notes:
+                memberNotes.value.trim()
+
+        };
+
+
+        if (existingId) {
+
+            const index =
+                teamMembers.findIndex(
+                    member =>
+                        Number(
+                            member.id
+                        ) ===
+                        Number(
+                            existingId
+                        )
+                );
+
+
+            if (index !== -1) {
+
+                teamMembers[index] = {
+
+                    ...teamMembers[index],
+
+                    ...data
+
+                };
+
+            }
+
+        } else {
+
+            teamMembers.push({
+
+                id: Date.now(),
+
+                ...data
+
+            });
+
+        }
+
+
+        saveTeamMembers();
+
+        closeModal(memberModal);
+
+        renderAll();
+
+        showSection("team");
+
+    }
+);
+
+
+/* =========================================================
+   TASK HELPERS
+========================================================= */
+
+function getTaskStatusLabel(
+    status
+) {
+
+    const labels = {
+
+        todo: "To Do",
+
+        progress: "In Progress",
+
+        review: "Review",
+
+        completed: "Completed"
+
+    };
+
+
+    return (
+        labels[status] ||
+        capitalize(status)
+    );
+
+}
+
+
+function getTaskPriorityLabel(
+    priority
+) {
+
+    const labels = {
+
+        low: "Low",
+
+        medium: "Medium",
+
+        high: "High",
+
+        urgent: "Urgent"
+
+    };
+
+
+    return (
+        labels[priority] ||
+        capitalize(priority)
+    );
+
+}
+
+
+function getTaskProject(
+    task
+) {
+
+    return jobs.find(
+        job =>
+            Number(job.id) ===
+            Number(task.projectId)
+    );
+
+}
+
+
+function getTaskAssignee(
+    task
+) {
+
+    return teamMembers.find(
+        member =>
+            Number(member.id) ===
+            Number(task.assigneeId)
+    );
+
+}
+
+
+function isTaskOverdue(task) {
+
+    if (
+        !task.dueDate ||
+        task.status ===
+        "completed"
+    ) {
+
+        return false;
+
+    }
+
+
+    const due =
+        new Date(
+            `${task.dueDate}T23:59:59`
+        );
+
+
+    return (
+        !Number.isNaN(
+            due.getTime()
+        ) &&
+        due < new Date()
+    );
+
+}
+
+
+/* =========================================================
+   TASK STATS
+========================================================= */
+
+function updateTaskStats() {
+
+    const total =
+        tasks.length;
+
+
+    const progress =
+        tasks.filter(
+            task =>
+                task.status ===
+                "progress"
+        ).length;
+
+
+    const pending =
+        tasks.filter(
+            task =>
+                task.status ===
+                "todo"
+        ).length;
+
+
+    const completed =
+        tasks.filter(
+            task =>
+                task.status ===
+                "completed"
+        ).length;
+
+
+    if (totalTasks) {
+
+        totalTasks.textContent =
+            total;
+
+    }
+
+
+    if (inProgressTasks) {
+
+        inProgressTasks.textContent =
+            progress;
+
+    }
+
+
+    if (pendingTasks) {
+
+        pendingTasks.textContent =
+            pending;
+
+    }
+
+
+    if (completedTasks) {
+
+        completedTasks.textContent =
+            completed;
+
+    }
+
+
+    if (dashboardTaskCount) {
+
+        dashboardTaskCount.textContent =
+            total;
+
+    }
+
+
+    if (dashboardActiveTasks) {
+
+        dashboardActiveTasks.textContent =
+            total - completed;
+
+    }
+
+
+    if (dashboardCompletedTasks) {
+
+        dashboardCompletedTasks.textContent =
+            completed;
+
+    }
+
+}
+
+
+/* =========================================================
+   TASK DISPLAY
+========================================================= */
+
+function displayTasks(
+    taskList
+) {
+
+    if (!tasksGrid) {
+        return;
+    }
+
+
+    tasksGrid.innerHTML = "";
+
+
+    if (!taskList.length) {
+
+        emptyTasks.classList.remove(
+            "hidden"
+        );
+
+        return;
+
+    }
+
+
+    emptyTasks.classList.add(
+        "hidden"
+    );
+
+
+    /*
+     * We use the existing .tasks-board
+     * structure from your CSS.
+     */
+
+    const columns = {
+
+        todo: createTaskColumn(
+            "To Do",
+            "bi-list-task",
+            "todo"
+        ),
+
+        progress: createTaskColumn(
+            "In Progress",
+            "bi-arrow-repeat",
+            "progress"
+        ),
+
+        review: createTaskColumn(
+            "Review",
+            "bi-eye",
+            "review"
+        ),
+
+        completed: createTaskColumn(
+            "Completed",
+            "bi-check-circle",
+            "completed"
+        )
+
+    };
+
+
+    taskList.forEach(task => {
+
+        const status =
+            columns[task.status]
+                ? task.status
+                : "todo";
+
+
+        columns[status]
+            .querySelector(
+                ".task-list"
+            )
+            .appendChild(
+                createTaskCard(task)
+            );
+
+
+        const count =
+            columns[status]
+                .querySelector(
+                    ".task-count"
+                );
+
+
+        count.textContent =
+            columns[status]
+                .querySelectorAll(
+                    ".task-card"
+                ).length;
+
+    });
+
+
+    Object.values(columns)
+        .forEach(column => {
+
+            tasksGrid.appendChild(
+                column
+            );
+
+        });
+
+}
+
+
+function createTaskColumn(
+    title,
+    icon,
+    status
+) {
+
+    const column =
+        document.createElement(
+            "div"
+        );
+
+
+    column.className =
+        "task-column";
+
+
+    column.innerHTML = `
+
+        <div class="task-column-header">
+
+            <div class="task-column-title">
+
+                <i class="bi ${icon}"></i>
+
+                <h3>
+                    ${title}
+                </h3>
+
+                <span class="task-count">
+                    0
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="task-list"></div>
+
+    `;
+
+
+    return column;
+
+}
+
+
+function createTaskCard(
+    task
+) {
+
+    const project =
+        getTaskProject(task);
+
+
+    const assignee =
+        getTaskAssignee(task);
+
+
+    const priority =
+        String(
+            task.priority ||
+            "medium"
+        ).toLowerCase();
+
+
+    const overdue =
+        isTaskOverdue(task);
+
+
+    const card =
+        document.createElement(
+            "article"
+        );
+
+
+    card.className =
+        "task-card";
+
+
+    const status =
+        String(
+            task.status ||
+            "todo"
+        ).toLowerCase();
+
+
+    let progress = 0;
+
+
+    if (status === "progress") {
+        progress = 50;
+    }
+
+    if (status === "review") {
+        progress = 80;
+    }
+
+    if (status === "completed") {
+        progress = 100;
+    }
+
+
+    card.innerHTML = `
+
+        <div class="task-card-header">
+
+            <h4>
+                ${escapeHTML(
+                    task.title ||
+                    "Untitled Task"
+                )}
+            </h4>
+
+
+            <span class="task-priority ${safePriority(
+                priority
+            )}">
+
+                ${getTaskPriorityLabel(
+                    priority
+                )}
+
+            </span>
+
+        </div>
+
+
+        ${
+            task.description
+                ? `
+                    <p class="task-description">
+
+                        ${escapeHTML(
+                            task.description
+                        )}
+
+                    </p>
+                `
+                : ""
+        }
+
+
+        <div class="task-meta">
+
+            <span class="task-project">
+
+                <i class="bi bi-folder"></i>
+
+                ${
+                    project
+                        ? escapeHTML(
+                            project.name
+                        )
+                        : "No project"
+                }
+
+            </span>
+
+        </div>
+
+
+        <div class="task-progress">
+
+            <div class="task-progress-top">
+
+                <span>
+                    Progress
+                </span>
+
+                <strong>
+                    ${progress}%
+                </strong>
+
+            </div>
+
+
+            <div class="task-progress-bar">
+
+                <div
+                    class="task-progress-fill"
+                    style="width:${progress}%"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+        <div class="task-footer">
+
+            <div class="task-assignee">
+
+                <div class="task-assignee-avatar">
+
+                    ${
+                        assignee
+                            ? getInitials(
+                                assignee.name
+                            )
+                            : "?"
+                    }
+
+                </div>
+
+
+                <span>
+
+                    ${
+                        assignee
+                            ? escapeHTML(
+                                assignee.name
+                            )
+                            : "Unassigned"
+                    }
+
+                </span>
+
+            </div>
+
+
+            ${
+                task.dueDate
+                    ? `
+                        <div class="task-due-date ${
+                            overdue
+                                ? "overdue"
+                                : ""
+                        }">
+
+                            <i class="bi bi-calendar3"></i>
+
+                            ${formatDate(
+                                task.dueDate
+                            )}
+
+                        </div>
+                    `
+                    : ""
+            }
+
+
+            <div class="task-actions">
+
+                <button
+                    type="button"
+                    class="task-action-btn edit-task"
+                    data-id="${task.id}"
+                    title="Edit task"
+                >
+
+                    <i class="bi bi-pencil"></i>
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="task-action-btn delete delete-task"
+                    data-id="${task.id}"
+                    title="Delete task"
+                >
+
+                    <i class="bi bi-trash"></i>
+
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    return card;
+
+}
+
+
+function attachTaskActions() {
+
+    document
+        .querySelectorAll(
+            ".edit-task"
+        )
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    editTask(
+                        Number(
+                            button.dataset.id
+                        )
+                    );
+
+                }
+            );
+
+        });
+
+
+    document
+        .querySelectorAll(
+            ".delete-task"
+        )
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    deleteTask(
+                        Number(
+                            button.dataset.id
+                        )
+                    );
+
+                }
+            );
+
+        });
+
+}
+
+
+/* =========================================================
+   TASK FILTERING
+========================================================= */
+
+function filterTasks() {
+
+    const search =
+        taskSearch.value
+            .trim()
+            .toLowerCase();
+
+
+    const status =
+        taskStatusFilter.value;
+
+
+    const priority =
+        taskPriorityFilter.value;
+
+
+    const member =
+        taskMemberFilter.value;
+
+
+    const filtered =
+        tasks.filter(task => {
+
+            const project =
+                getTaskProject(task);
+
+
+            const assignee =
+                getTaskAssignee(task);
+
+
+            const searchable = [
+
+                task.title,
+
+                task.description,
+
+                task.notes,
+
+                project?.name,
+
+                assignee?.name
+
+            ]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase();
+
+
+            const matchesSearch =
+                searchable.includes(
+                    search
+                );
+
+
+            const matchesStatus =
+                status === "all" ||
+                task.status === status;
+
+
+            const matchesPriority =
+                priority === "all" ||
+                task.priority === priority;
+
+
+            const matchesMember =
+                member === "all" ||
+                String(
+                    task.assigneeId
+                ) === String(member);
+
+
+            return (
+                matchesSearch &&
+                matchesStatus &&
+                matchesPriority &&
+                matchesMember
+            );
+
+        });
+
+
+    displayTasks(filtered);
+
+    updateTaskStats();
+
+    attachTaskActions();
+
+}
+
+
+/* =========================================================
+   TASK SELECT OPTIONS
+========================================================= */
+
+function populateTaskProjectOptions() {
+
+    if (!taskProject) {
+        return;
+    }
+
+
+    const currentValue =
+        taskProject.value;
+
+
+    taskProject.innerHTML = `
+
+        <option value="">
+            No Project
+        </option>
+
+    `;
+
+
+    jobs.forEach(job => {
+
+        const option =
+            document.createElement(
+                "option"
+            );
+
+
+        option.value =
+            job.id;
+
+
+        option.textContent =
+            `${job.name} — ${job.client}`;
+
+
+        taskProject.appendChild(
+            option
+        );
+
+    });
+
+
+    if (
+        jobs.some(
+            job =>
+                String(job.id) ===
+                String(currentValue)
+        )
+    ) {
+
+        taskProject.value =
+            currentValue;
+
+    }
+
+}
+
+
+function populateTaskMemberOptions() {
+
+    if (!taskAssignee) {
+        return;
+    }
+
+
+    const currentValue =
+        taskAssignee.value;
+
+
+    taskAssignee.innerHTML = `
+
+        <option value="">
+            Unassigned
+        </option>
+
+    `;
+
+
+    teamMembers.forEach(member => {
+
+        const option =
+            document.createElement(
+                "option"
+            );
+
+
+        option.value =
+            member.id;
+
+
+        option.textContent =
+            `${member.name}${
+                member.role
+                    ? ` — ${member.role}`
+                    : ""
+            }`;
+
+
+        taskAssignee.appendChild(
+            option
+        );
+
+    });
+
+
+    if (
+        teamMembers.some(
+            member =>
+                String(member.id) ===
+                String(currentValue)
+        )
+    ) {
+
+        taskAssignee.value =
+            currentValue;
+
+    }
+
+}
+
+
+function populateTaskMemberFilter() {
+
+    if (!taskMemberFilter) {
+        return;
+    }
+
+
+    const currentValue =
+        taskMemberFilter.value;
+
+
+    taskMemberFilter.innerHTML = `
+
+        <option value="all">
+            All Members
+        </option>
+
+    `;
+
+
+    teamMembers.forEach(member => {
+
+        const option =
+            document.createElement(
+                "option"
+            );
+
+
+        option.value =
+            member.id;
+
+
+        option.textContent =
+            member.name;
+
+
+        taskMemberFilter.appendChild(
+            option
+        );
+
+    });
+
+
+    const exists =
+        teamMembers.some(
+            member =>
+                String(member.id) ===
+                String(currentValue)
+        );
+
+
+    taskMemberFilter.value =
+        exists
+            ? currentValue
+            : "all";
+
+}
+
+
+/* =========================================================
+   TASK MODAL
+========================================================= */
+
+function openTaskModal() {
+
+    taskForm.reset();
+
+    taskId.value = "";
+
+    taskModalTitle.textContent =
+        "Add New Task";
+
+
+    populateTaskProjectOptions();
+
+    populateTaskMemberOptions();
+
+
+    openModal(taskModal);
+
+}
+
+
+function editTask(id) {
+
+    const task =
+        tasks.find(
+            item =>
+                Number(item.id) ===
+                Number(id)
+        );
+
+
+    if (!task) {
+        return;
+    }
+
+
+    taskModalTitle.textContent =
+        "Edit Task";
+
+
+    taskId.value =
+        task.id;
+
+
+    taskTitle.value =
+        task.title || "";
+
+
+    taskDescription.value =
+        task.description || "";
+
+
+    populateTaskProjectOptions();
+
+    populateTaskMemberOptions();
+
+
+    taskProject.value =
+        task.projectId || "";
+
+
+    taskAssignee.value =
+        task.assigneeId || "";
+
+
+    taskPriority.value =
+        task.priority ||
+        "medium";
+
+
+    taskDueDate.value =
+        task.dueDate || "";
+
+
+    taskStatus.value =
+        task.status ||
+        "todo";
+
+
+    taskNotes.value =
+        task.notes || "";
+
+
+    openModal(taskModal);
+
+}
+
+
+function deleteTask(id) {
+
+    const task =
+        tasks.find(
+            item =>
+                Number(item.id) ===
+                Number(id)
+        );
+
+
+    if (!task) {
+        return;
+    }
+
+
+    const confirmed =
+        window.confirm(
+            `Delete task "${task.title}"?`
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    tasks =
+        tasks.filter(
+            item =>
+                Number(item.id) !==
+                Number(id)
+        );
+
+
+    saveTasks();
+
+    renderAll();
+
+}
+
+
+/* =========================================================
+   TASK FORM
+========================================================= */
+
+taskForm.addEventListener(
+    "submit",
+    event => {
+
+        event.preventDefault();
+
+
+        const title =
+            taskTitle.value.trim();
+
+
+        if (!title) {
+            return;
+        }
+
+
+        const data = {
+
+            title,
+
+            description:
+                taskDescription.value.trim(),
+
+            projectId:
+                taskProject.value || "",
+
+            assigneeId:
+                taskAssignee.value || "",
+
+            priority:
+                taskPriority.value ||
+                "medium",
+
+            dueDate:
+                taskDueDate.value || "",
+
+            status:
+                taskStatus.value ||
+                "todo",
+
+            notes:
+                taskNotes.value.trim()
+
+        };
+
+
+        const existingId =
+            taskId.value;
+
+
+        if (existingId) {
+
+            const index =
+                tasks.findIndex(
+                    item =>
+                        Number(item.id) ===
+                        Number(existingId)
+                );
+
+
+            if (index !== -1) {
+
+                tasks[index] = {
+
+                    ...tasks[index],
+
+                    ...data
+
+                };
+
+            }
+
+        } else {
+
+            tasks.push({
+
+                id: Date.now(),
+
+                ...data
+
+            });
+
+        }
+
+
+        saveTasks();
+
+        closeModal(taskModal);
+
+        renderAll();
+
+        showSection("tasks");
+
+    }
+);
+
+
+/* =========================================================
    DASHBOARD
 ========================================================= */
 
@@ -1895,6 +4313,14 @@ function renderDashboard() {
 
     updateClientStats();
 
+    updateTeamStats();
+
+    updateTaskStats();
+
+
+    /* -----------------------------------------------------
+       Recent Projects
+    ----------------------------------------------------- */
 
     const latestJobs =
         [...jobs]
@@ -1906,7 +4332,8 @@ function renderDashboard() {
             .slice(0, 5);
 
 
-    recentProjects.innerHTML = "";
+    recentProjects.innerHTML =
+        "";
 
 
     if (!latestJobs.length) {
@@ -1916,7 +4343,9 @@ function renderDashboard() {
             <div class="empty-state">
 
                 <div class="empty-icon">
+
                     <i class="bi bi-kanban"></i>
+
                 </div>
 
                 <p>
@@ -1937,12 +4366,9 @@ function renderDashboard() {
 
                     <div class="project-mini-icon">
 
-                        <i class="bi ${
-                            escapeHTML(
-                                job.icon ||
-                                "bi-folder"
-                            )
-                        }"></i>
+                        <i class="bi ${safeIcon(
+                            job.icon
+                        )}"></i>
 
                     </div>
 
@@ -1950,21 +4376,29 @@ function renderDashboard() {
                     <div class="project-mini-info">
 
                         <strong>
-                            ${escapeHTML(job.name)}
+
+                            ${escapeHTML(
+                                job.name
+                            )}
+
                         </strong>
 
+
                         <span>
-                            ${escapeHTML(job.client)}
+
+                            ${escapeHTML(
+                                job.client
+                            )}
+
                         </span>
 
                     </div>
 
 
-                    <span class="status status-${
-                        escapeHTML(
-                            job.status || "pending"
-                        )
-                    }">
+                    <span class="status status-${safeStatus(
+                        job.status ||
+                        "pending"
+                    )}">
 
                         ${capitalize(
                             job.status ||
@@ -1982,7 +4416,12 @@ function renderDashboard() {
     }
 
 
-    dashboardClients.innerHTML = "";
+    /* -----------------------------------------------------
+       Dashboard Clients
+    ----------------------------------------------------- */
+
+    dashboardClients.innerHTML =
+        "";
 
 
     clients
@@ -1995,7 +4434,9 @@ function renderDashboard() {
 
                     <div class="client-mini-avatar">
 
-                        ${getInitials(client.name)}
+                        ${getInitials(
+                            client.name
+                        )}
 
                     </div>
 
@@ -2003,25 +4444,30 @@ function renderDashboard() {
                     <div class="client-mini-info">
 
                         <strong>
-                            ${escapeHTML(client.name)}
+
+                            ${escapeHTML(
+                                client.name
+                            )}
+
                         </strong>
 
+
                         <span>
+
                             ${escapeHTML(
                                 client.company ||
                                 "Client"
                             )}
+
                         </span>
 
                     </div>
 
 
-                    <span class="status status-${
-                        escapeHTML(
-                            client.status ||
-                            "active"
-                        )
-                    }">
+                    <span class="status status-${safeStatus(
+                        client.status ||
+                        "active"
+                    )}">
 
                         ${capitalize(
                             client.status ||
@@ -2036,6 +4482,132 @@ function renderDashboard() {
 
         });
 
+
+    /* -----------------------------------------------------
+       Dashboard Tasks
+    ----------------------------------------------------- */
+
+    if (!dashboardTasks) {
+        return;
+    }
+
+
+    dashboardTasks.innerHTML =
+        "";
+
+
+    const latestTasks =
+        [...tasks]
+            .sort(
+                (a, b) =>
+                    Number(b.id) -
+                    Number(a.id)
+            )
+            .slice(0, 5);
+
+
+    if (!latestTasks.length) {
+
+        dashboardTasks.innerHTML = `
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+
+                    <i class="bi bi-check2-square"></i>
+
+                </div>
+
+                <p>
+                    No tasks yet.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    latestTasks.forEach(task => {
+
+        const project =
+            getTaskProject(task);
+
+
+        const assignee =
+            getTaskAssignee(task);
+
+
+        dashboardTasks.innerHTML += `
+
+            <div class="recent-project-item">
+
+                <div class="project-mini-icon">
+
+                    <i class="bi bi-check2-square"></i>
+
+                </div>
+
+
+                <div class="project-mini-info">
+
+                    <strong>
+
+                        ${escapeHTML(
+                            task.title
+                        )}
+
+                    </strong>
+
+
+                    <span>
+
+                        ${
+                            assignee
+                                ? escapeHTML(
+                                    assignee.name
+                                )
+                                : "Unassigned"
+                        }
+
+                        ${
+                            project
+                                ? ` • ${escapeHTML(
+                                    project.name
+                                )}`
+                                : ""
+                        }
+
+                    </span>
+
+                </div>
+
+
+                <span class="status status-${
+                    task.status ===
+                    "completed"
+                        ? "completed"
+                        : task.status ===
+                          "todo"
+                            ? "pending"
+                            : "active"
+                }">
+
+                    ${getTaskStatusLabel(
+                        task.status
+                    )}
+
+                </span>
+
+            </div>
+
+        `;
+
+    });
+
 }
 
 
@@ -2048,7 +4620,8 @@ function displayPayments() {
     updateStats();
 
 
-    paymentList.innerHTML = "";
+    paymentList.innerHTML =
+        "";
 
 
     if (!jobs.length) {
@@ -2058,7 +4631,9 @@ function displayPayments() {
             <div class="empty-state">
 
                 <div class="empty-icon">
+
                     <i class="bi bi-wallet2"></i>
+
                 </div>
 
                 <h3>
@@ -2083,11 +4658,13 @@ function displayPayments() {
         const budget =
             Number(job.budget) || 0;
 
+
         const paid =
             Math.min(
                 Number(job.paid) || 0,
                 budget
             );
+
 
         const balance =
             Math.max(
@@ -2134,12 +4711,9 @@ function displayPayments() {
 
                     <div class="payment-project-icon">
 
-                        <i class="bi ${
-                            escapeHTML(
-                                job.icon ||
-                                "bi-folder"
-                            )
-                        }"></i>
+                        <i class="bi ${safeIcon(
+                            job.icon
+                        )}"></i>
 
                     </div>
 
@@ -2147,11 +4721,20 @@ function displayPayments() {
                     <div>
 
                         <strong>
-                            ${escapeHTML(job.name)}
+
+                            ${escapeHTML(
+                                job.name
+                            )}
+
                         </strong>
 
+
                         <span>
-                            ${escapeHTML(job.client)}
+
+                            ${escapeHTML(
+                                job.client
+                            )}
+
                         </span>
 
                     </div>
@@ -2165,10 +4748,19 @@ function displayPayments() {
                         Paid / Budget
                     </span>
 
+
                     <strong>
-                        ${formatMoney(paid)}
+
+                        ${formatMoney(
+                            paid
+                        )}
+
                         /
-                        ${formatMoney(budget)}
+
+                        ${formatMoney(
+                            budget
+                        )}
+
                     </strong>
 
                 </div>
@@ -2182,14 +4774,20 @@ function displayPayments() {
 
                     </div>
 
+
                     <div class="payment-amount">
 
                         <span>
                             Balance
                         </span>
 
+
                         <strong>
-                            ${formatMoney(balance)}
+
+                            ${formatMoney(
+                                balance
+                            )}
+
                         </strong>
 
                     </div>
@@ -2211,25 +4809,32 @@ function displayPayments() {
 
 function displayDeadlines() {
 
-    deadlineList.innerHTML = "";
+    deadlineList.innerHTML =
+        "";
 
 
     const activeJobs =
         jobs
             .filter(
                 job =>
-                    String(job.status)
-                        .toLowerCase() !==
+                    String(
+                        job.status
+                    ).toLowerCase() !==
                     "completed" &&
 
-                    String(job.status)
-                        .toLowerCase() !==
+                    String(
+                        job.status
+                    ).toLowerCase() !==
                     "cancelled"
             )
             .sort(
                 (a, b) =>
-                    new Date(a.deadline) -
-                    new Date(b.deadline)
+                    new Date(
+                        a.deadline
+                    ) -
+                    new Date(
+                        b.deadline
+                    )
             );
 
 
@@ -2240,7 +4845,9 @@ function displayDeadlines() {
             <div class="empty-state">
 
                 <div class="empty-icon">
+
                     <i class="bi bi-calendar-check"></i>
+
                 </div>
 
                 <h3>
@@ -2271,6 +4878,7 @@ function displayDeadlines() {
         const now =
             new Date();
 
+
         const today =
             new Date(
                 now.getFullYear(),
@@ -2298,12 +4906,16 @@ function displayDeadlines() {
             warning =
                 "Overdue";
 
-        } else if (difference === 0) {
+        } else if (
+            difference === 0
+        ) {
 
             warning =
                 "Today";
 
-        } else if (difference === 1) {
+        } else if (
+            difference === 1
+        ) {
 
             warning =
                 "Tomorrow";
@@ -2323,16 +4935,22 @@ function displayDeadlines() {
                 <div class="deadline-date">
 
                     <span class="month">
+
                         ${deadline.toLocaleDateString(
                             "en-US",
                             {
-                                month: "short"
+                                month:
+                                    "short"
                             }
                         )}
+
                     </span>
 
+
                     <span class="day">
+
                         ${deadline.getDate()}
+
                     </span>
 
                 </div>
@@ -2341,11 +4959,20 @@ function displayDeadlines() {
                 <div class="deadline-info">
 
                     <strong>
-                        ${escapeHTML(job.name)}
+
+                        ${escapeHTML(
+                            job.name
+                        )}
+
                     </strong>
 
+
                     <span>
-                        ${escapeHTML(job.client)}
+
+                        ${escapeHTML(
+                            job.client
+                        )}
+
                     </span>
 
                 </div>
@@ -2376,7 +5003,11 @@ function openModal(modal) {
         return;
     }
 
-    modal.classList.add("active");
+
+    modal.classList.add(
+        "active"
+    );
+
 
     document.body.style.overflow =
         "hidden";
@@ -2390,7 +5021,11 @@ function closeModal(modal) {
         return;
     }
 
-    modal.classList.remove("active");
+
+    modal.classList.remove(
+        "active"
+    );
+
 
     document.body.style.overflow =
         "";
@@ -2401,7 +5036,9 @@ function closeModal(modal) {
 function closeAllModals() {
 
     document
-        .querySelectorAll(".modal-overlay")
+        .querySelectorAll(
+            ".modal-overlay"
+        )
         .forEach(modal => {
 
             modal.classList.remove(
@@ -2417,10 +5054,14 @@ function closeAllModals() {
 }
 
 
-/* Job buttons */
+/* =========================================================
+   JOB BUTTONS
+========================================================= */
 
 document
-    .getElementById("addJobBtn")
+    .getElementById(
+        "addJobBtn"
+    )
     .addEventListener(
         "click",
         openAddModal
@@ -2428,7 +5069,9 @@ document
 
 
 document
-    .getElementById("dashboardAddJobBtn")
+    .getElementById(
+        "dashboardAddJobBtn"
+    )
     .addEventListener(
         "click",
         openAddModal
@@ -2436,7 +5079,9 @@ document
 
 
 document
-    .getElementById("emptyAddJobBtn")
+    .getElementById(
+        "emptyAddJobBtn"
+    )
     .addEventListener(
         "click",
         openAddModal
@@ -2444,25 +5089,39 @@ document
 
 
 document
-    .getElementById("closeJobModal")
+    .getElementById(
+        "closeJobModal"
+    )
     .addEventListener(
         "click",
-        () => closeModal(jobModal)
+        () =>
+            closeModal(
+                jobModal
+            )
     );
 
 
 document
-    .getElementById("cancelJobBtn")
+    .getElementById(
+        "cancelJobBtn"
+    )
     .addEventListener(
         "click",
-        () => closeModal(jobModal)
+        () =>
+            closeModal(
+                jobModal
+            )
     );
 
 
-/* Client buttons */
+/* =========================================================
+   CLIENT BUTTONS
+========================================================= */
 
 document
-    .getElementById("addClientBtn")
+    .getElementById(
+        "addClientBtn"
+    )
     .addEventListener(
         "click",
         openClientModal
@@ -2470,7 +5129,9 @@ document
 
 
 document
-    .getElementById("emptyAddClientBtn")
+    .getElementById(
+        "emptyAddClientBtn"
+    )
     .addEventListener(
         "click",
         openClientModal
@@ -2478,25 +5139,139 @@ document
 
 
 document
-    .getElementById("closeClientModal")
+    .getElementById(
+        "closeClientModal"
+    )
     .addEventListener(
         "click",
-        () => closeModal(clientModal)
+        () =>
+            closeModal(
+                clientModal
+            )
     );
 
 
 document
-    .getElementById("cancelClientBtn")
+    .getElementById(
+        "cancelClientBtn"
+    )
     .addEventListener(
         "click",
-        () => closeModal(clientModal)
+        () =>
+            closeModal(
+                clientModal
+            )
     );
 
 
-/* Outside click */
+/* =========================================================
+   TEAM BUTTONS
+========================================================= */
 
 document
-    .querySelectorAll(".modal-overlay")
+    .getElementById(
+        "addMemberBtn"
+    )
+    .addEventListener(
+        "click",
+        openMemberModal
+    );
+
+
+document
+    .getElementById(
+        "emptyAddMemberBtn"
+    )
+    .addEventListener(
+        "click",
+        openMemberModal
+    );
+
+
+document
+    .getElementById(
+        "closeMemberModal"
+    )
+    .addEventListener(
+        "click",
+        () =>
+            closeModal(
+                memberModal
+            )
+    );
+
+
+document
+    .getElementById(
+        "cancelMemberBtn"
+    )
+    .addEventListener(
+        "click",
+        () =>
+            closeModal(
+                memberModal
+            )
+    );
+
+
+/* =========================================================
+   TASK BUTTONS
+========================================================= */
+
+document
+    .getElementById(
+        "addTaskBtn"
+    )
+    .addEventListener(
+        "click",
+        openTaskModal
+    );
+
+
+document
+    .getElementById(
+        "emptyAddTaskBtn"
+    )
+    .addEventListener(
+        "click",
+        openTaskModal
+    );
+
+
+document
+    .getElementById(
+        "closeTaskModal"
+    )
+    .addEventListener(
+        "click",
+        () =>
+            closeModal(
+                taskModal
+            )
+    );
+
+
+document
+    .getElementById(
+        "cancelTaskBtn"
+    )
+    .addEventListener(
+        "click",
+        () =>
+            closeModal(
+                taskModal
+            )
+    );
+
+
+/* =========================================================
+   MODAL OUTSIDE CLICK
+========================================================= */
+
+document
+    .querySelectorAll(
+        ".modal-overlay"
+    )
     .forEach(overlay => {
 
         overlay.addEventListener(
@@ -2508,7 +5283,9 @@ document
                     overlay
                 ) {
 
-                    closeModal(overlay);
+                    closeModal(
+                        overlay
+                    );
 
                 }
 
@@ -2518,13 +5295,18 @@ document
     });
 
 
-/* Escape */
+/* =========================================================
+   ESCAPE KEY
+========================================================= */
 
 document.addEventListener(
     "keydown",
     event => {
 
-        if (event.key === "Escape") {
+        if (
+            event.key ===
+            "Escape"
+        ) {
 
             closeAllModals();
 
@@ -2558,12 +5340,16 @@ function setTheme(theme) {
     );
 
 
-    updateThemeButtons(isDark);
+    updateThemeButtons(
+        isDark
+    );
 
 }
 
 
-function updateThemeButtons(isDark) {
+function updateThemeButtons(
+    isDark
+) {
 
     const iconClass =
         isDark
@@ -2578,9 +5364,13 @@ function updateThemeButtons(isDark) {
             <i class="bi ${iconClass}"></i>
 
             <span>
-                ${isDark
-                    ? "Light Mode"
-                    : "Dark Mode"}
+
+                ${
+                    isDark
+                        ? "Light Mode"
+                        : "Dark Mode"
+                }
+
             </span>
 
         `;
@@ -2605,9 +5395,11 @@ function updateThemeButtons(isDark) {
 
             <i class="bi ${iconClass}"></i>
 
-            ${isDark
-                ? "Light Mode"
-                : "Dark Mode"}
+            ${
+                isDark
+                    ? "Light Mode"
+                    : "Dark Mode"
+            }
 
         `;
 
@@ -2633,22 +5425,34 @@ function toggleTheme() {
 }
 
 
-themeToggle.addEventListener(
-    "click",
-    toggleTheme
-);
+if (themeToggle) {
+
+    themeToggle.addEventListener(
+        "click",
+        toggleTheme
+    );
+
+}
 
 
-topThemeToggle.addEventListener(
-    "click",
-    toggleTheme
-);
+if (topThemeToggle) {
+
+    topThemeToggle.addEventListener(
+        "click",
+        toggleTheme
+    );
+
+}
 
 
-settingsThemeToggle.addEventListener(
-    "click",
-    toggleTheme
-);
+if (settingsThemeToggle) {
+
+    settingsThemeToggle.addEventListener(
+        "click",
+        toggleTheme
+    );
+
+}
 
 
 /* =========================================================
@@ -2657,9 +5461,16 @@ settingsThemeToggle.addEventListener(
 
 function openMobileSidebar() {
 
+    if (!sidebar ||
+        !sidebarOverlay) {
+        return;
+    }
+
+
     sidebar.classList.add(
         "mobile-open"
     );
+
 
     sidebarOverlay.classList.add(
         "active"
@@ -2670,9 +5481,16 @@ function openMobileSidebar() {
 
 function closeMobileSidebar() {
 
+    if (!sidebar ||
+        !sidebarOverlay) {
+        return;
+    }
+
+
     sidebar.classList.remove(
         "mobile-open"
     );
+
 
     sidebarOverlay.classList.remove(
         "active"
@@ -2681,16 +5499,24 @@ function closeMobileSidebar() {
 }
 
 
-mobileMenuBtn.addEventListener(
-    "click",
-    openMobileSidebar
-);
+if (mobileMenuBtn) {
+
+    mobileMenuBtn.addEventListener(
+        "click",
+        openMobileSidebar
+    );
+
+}
 
 
-sidebarOverlay.addEventListener(
-    "click",
-    closeMobileSidebar
-);
+if (sidebarOverlay) {
+
+    sidebarOverlay.addEventListener(
+        "click",
+        closeMobileSidebar
+    );
+
+}
 
 
 /* =========================================================
@@ -2721,6 +5547,36 @@ clientSearch.addEventListener(
 );
 
 
+teamSearch.addEventListener(
+    "input",
+    filterTeamMembers
+);
+
+
+taskSearch.addEventListener(
+    "input",
+    filterTasks
+);
+
+
+taskStatusFilter.addEventListener(
+    "change",
+    filterTasks
+);
+
+
+taskPriorityFilter.addEventListener(
+    "change",
+    filterTasks
+);
+
+
+taskMemberFilter.addEventListener(
+    "change",
+    filterTasks
+);
+
+
 /* =========================================================
    WALLET COPY
 ========================================================= */
@@ -2731,134 +5587,162 @@ const copyWalletButtons =
     );
 
 
-copyWalletButtons.forEach(button => {
+copyWalletButtons.forEach(
+    button => {
 
-    button.addEventListener(
-        "click",
-        async () => {
+        button.addEventListener(
+            "click",
+            async () => {
 
-            const walletAddress =
-                button.dataset.wallet;
-
-
-            if (
-                !walletAddress ||
-                walletAddress.startsWith(
-                    "YOUR_"
-                )
-            ) {
-
-                alert(
-                    "Copied"
-                );
-
-                return;
-
-            }
+                let walletAddress =
+                    button.dataset.wallet;
 
 
-            const originalHTML =
-                button.innerHTML;
-
-
-            try {
+                /*
+                 * If data-wallet is still a placeholder,
+                 * copy the actual visible address instead.
+                 */
 
                 if (
-                    navigator.clipboard &&
-                    window.isSecureContext
+                    !walletAddress ||
+                    walletAddress.startsWith(
+                        "YOUR_"
+                    )
                 ) {
 
-                    await navigator.clipboard.writeText(
-                        walletAddress
-                    );
-
-                } else {
-
-                    const textarea =
-                        document.createElement(
-                            "textarea"
-                        );
+                    const addressElement =
+                        button
+                            .closest(
+                                ".wallet-card"
+                            )
+                            ?.querySelector(
+                                ".wallet-address span"
+                            );
 
 
-                    textarea.value =
-                        walletAddress;
-
-
-                    textarea.style.position =
-                        "fixed";
-
-                    textarea.style.opacity =
-                        "0";
-
-
-                    document.body.appendChild(
-                        textarea
-                    );
-
-
-                    textarea.focus();
-
-                    textarea.select();
-
-
-                    document.execCommand(
-                        "copy"
-                    );
-
-
-                    textarea.remove();
+                    walletAddress =
+                        addressElement
+                            ?.textContent
+                            .trim();
 
                 }
 
 
-                button.classList.add(
-                    "copied"
-                );
+                if (!walletAddress) {
+
+                    alert(
+                        "No wallet address available."
+                    );
+
+                    return;
+
+                }
 
 
-                button.innerHTML = `
-
-                    <i class="bi bi-check-lg"></i>
-
-                    <span>
-                        Copied
-                    </span>
-
-                `;
+                const originalHTML =
+                    button.innerHTML;
 
 
-                setTimeout(
-                    () => {
+                try {
 
-                        button.classList.remove(
-                            "copied"
+                    if (
+                        navigator.clipboard &&
+                        window.isSecureContext
+                    ) {
+
+                        await navigator.clipboard.writeText(
+                            walletAddress
                         );
 
-                        button.innerHTML =
-                            originalHTML;
+                    } else {
 
-                    },
-                    1800
-                );
+                        const textarea =
+                            document.createElement(
+                                "textarea"
+                            );
 
 
-            } catch (error) {
+                        textarea.value =
+                            walletAddress;
 
-                console.error(
-                    "Copy failed:",
-                    error
-                );
 
-                alert(
-                    "Could not copy the wallet address."
-                );
+                        textarea.style.position =
+                            "fixed";
+
+                        textarea.style.opacity =
+                            "0";
+
+
+                        document.body.appendChild(
+                            textarea
+                        );
+
+
+                        textarea.focus();
+
+                        textarea.select();
+
+
+                        document.execCommand(
+                            "copy"
+                        );
+
+
+                        textarea.remove();
+
+                    }
+
+
+                    button.classList.add(
+                        "copied"
+                    );
+
+
+                    button.innerHTML = `
+
+                        <i class="bi bi-check-lg"></i>
+
+                        <span>
+                            Copied
+                        </span>
+
+                    `;
+
+
+                    setTimeout(
+                        () => {
+
+                            button.classList.remove(
+                                "copied"
+                            );
+
+                            button.innerHTML =
+                                originalHTML;
+
+                        },
+                        1800
+                    );
+
+
+                } catch (error) {
+
+                    console.error(
+                        "Copy failed:",
+                        error
+                    );
+
+
+                    alert(
+                        "Could not copy the wallet address."
+                    );
+
+                }
 
             }
+        );
 
-        }
-    );
-
-});
+    }
+);
 
 
 /* =========================================================
@@ -2884,10 +5768,14 @@ function formatMoney(amount) {
 }
 
 
-function formatDate(dateString) {
+function formatDate(
+    dateString
+) {
 
     if (!dateString) {
+
         return "No deadline";
+
     }
 
 
@@ -2897,8 +5785,14 @@ function formatDate(dateString) {
         );
 
 
-    if (Number.isNaN(date.getTime())) {
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
         return "Invalid date";
+
     }
 
 
@@ -2921,12 +5815,14 @@ function capitalize(value) {
     }
 
 
-    return String(value)
-        .charAt(0)
-        .toUpperCase()
-        +
-        String(value)
-            .slice(1);
+    const text =
+        String(value);
+
+
+    return (
+        text.charAt(0).toUpperCase() +
+        text.slice(1)
+    );
 
 }
 
@@ -2999,9 +5895,99 @@ function getRandomIcon() {
 }
 
 
+function safeIcon(icon) {
+
+    const allowed = [
+
+        "bi-globe2",
+
+        "bi-code-slash",
+
+        "bi-window",
+
+        "bi-phone",
+
+        "bi-laptop",
+
+        "bi-palette",
+
+        "bi-shop",
+
+        "bi-bar-chart",
+
+        "bi-brush",
+
+        "bi-kanban",
+
+        "bi-folder"
+
+    ];
+
+
+    return allowed.includes(icon)
+        ? icon
+        : "bi-folder";
+
+}
+
+
+function safeStatus(status) {
+
+    const allowed = [
+
+        "active",
+
+        "pending",
+
+        "completed",
+
+        "cancelled"
+
+    ];
+
+
+    return allowed.includes(
+        String(status)
+            .toLowerCase()
+    )
+        ? String(status)
+            .toLowerCase()
+        : "pending";
+
+}
+
+
+function safePriority(priority) {
+
+    const allowed = [
+
+        "low",
+
+        "medium",
+
+        "high",
+
+        "urgent"
+
+    ];
+
+
+    return allowed.includes(
+        String(priority)
+            .toLowerCase()
+    )
+        ? String(priority)
+            .toLowerCase()
+        : "medium";
+
+}
+
+
 function escapeHTML(value) {
 
-    return String(value ?? "")
+    return String(
+        value ?? ""
+    )
         .replace(
             /&/g,
             "&amp;"
@@ -3036,13 +6022,29 @@ function renderAll() {
 
     updateClientStats();
 
+    updateTeamStats();
+
+    updateTaskStats();
+
+    populateTaskProjectOptions();
+
+    populateTaskMemberOptions();
+
+    populateTaskMemberFilter();
+
     displayJobs(jobs);
 
     displayClients(clients);
 
+    displayTeamMembers(
+        teamMembers
+    );
+
     displayPayments();
 
     displayDeadlines();
+
+    displayTasks(tasks);
 
     renderDashboard();
 
@@ -3064,7 +6066,10 @@ function initialize() {
         );
 
 
-    if (savedTheme === "dark") {
+    if (
+        savedTheme ===
+        "dark"
+    ) {
 
         setTheme("dark");
 
@@ -3085,7 +6090,9 @@ function initialize() {
 initialize();
 
 
-/* Update date occasionally */
+/* =========================================================
+   UPDATE DATE
+========================================================= */
 
 setInterval(
     updateCurrentDate,
